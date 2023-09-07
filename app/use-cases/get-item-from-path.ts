@@ -14,24 +14,6 @@ export async function getItemFromPath(path: string, language: string) {
                 type
                 content {
                   ...componentsContent
-                  ... on ContentChunkContent {
-                    chunks {
-                      id
-                      type
-                      content {
-                        ...componentsContent
-                      }
-                    }
-                  }
-                  ... on ComponentChoiceContent {
-                    selectedComponent {
-                      id
-                      type
-                      content {
-                        ...componentsContent
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -41,7 +23,6 @@ export async function getItemFromPath(path: string, language: string) {
               text
             }
             ... on RichTextContent {
-              json
               plainText
             }
             ... on ParagraphCollectionContent {
@@ -50,7 +31,6 @@ export async function getItemFromPath(path: string, language: string) {
                   text
                 }
                 body {
-                  json
                   plainText
                 }
                 images {
@@ -60,18 +40,6 @@ export async function getItemFromPath(path: string, language: string) {
                 }
               }
             }
-            ...on PropertiesTableContent {
-              sections {
-                title
-                properties {
-                  key
-                  value
-                }
-              }
-            }
-            #file  title
-            #video title
-            #image altText
           }
 
         `,

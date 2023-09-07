@@ -1,16 +1,56 @@
 import { componentType } from "../helpers";
-const SingleLine = ({ content, id, type }) => {
+import { useState } from "react";
+
+const SingleLine = ({
+  data,
+  item,
+}: {
+  data: any;
+  item: {
+    id: string;
+    language: string;
+  };
+}) => {
+  const [translation, setTranslation] = useState<any>(data.translation);
+
+  const handleClick = async (e: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("translation", translation)
+    try {
+      await fetch("/api/update", {
+        method: "POST",
+        body: JSON.stringify({
+          id: item.id,
+          language: item.language,
+          componentId: data.id,
+          content: translation,
+          type: "singleLine",
+        }),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-[160px_1fr] items-start gap-6 ">
+    <div className="grid grid-cols-[160px_1fr] items-start">
       <div className="flex capitalize font-medium text-sm items-center gap-2">
-        {componentType[type]}
-        {id}
+        {componentType["singleLine"]}
+        {data?.id}
       </div>
-      <form>
+      <form className="flex flex-row gap-2">
         <input
-          value={content.text}
-          className="bg-gray-50 w-full font-bold text-2xl"
+          value={translation}
+          className="bg-gray-50 w-full p-2"
+          onChange={(e) => setTranslation(e.target.value)}
         />
+        <button
+          className="w-[250px] bg-cyan-300 p-2 text-sm"
+          onClick={handleClick}
+        >
+          Use this translation
+        </button>
       </form>
     </div>
   );
