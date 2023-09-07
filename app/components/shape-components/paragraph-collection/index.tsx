@@ -8,9 +8,8 @@ const ParagraphCollection = ({
   data: any;
   item: { id: string; language: string };
 }) => {
-  const title = data?.type === "paragraphTitle" ? data?.translation : null;
-  const body = data?.type === "paragraphBody" ? data?.translation : null;
-  const [paragraphValue, setParagraphValue] = useState<any>(body);
+  const [titleValue, setTitleValue] = useState<any>("");
+  const [bodyValue, setBodyValue] = useState<any>("");
 
   //   const handleClick = async (e: any) => {
   //     e.preventDefault();
@@ -37,29 +36,29 @@ const ParagraphCollection = ({
         {data?.id}
       </div>
       <form>
-        <div className="mb-3 flex flex-row gap-2">
-          <input type="text" className="bg-gray-50 w-full p-2" value={title} />
-          <textarea
-            className="leading-8 bg-gray-50 w-full p-2"
-            onChange={(e) => {
-              setParagraphValue(e.target.value);
-            }}
-          >
-            {body && <p>{body}</p>}
-          </textarea>
-
-          {/* {p.images?.map((img: any) => (
-                <div className="flex mb-4 items-center gap-4" key={img?.url}>
-                  <div className="w-32 rounded overflow-hidden shadow">
-                    <img src={img?.url} className="w-full " />
-                  </div>
-                  <div>
-                    {img.altText ?? (
-                      <span className="text-orange-500">No alt text</span>
-                    )}
-                  </div>
+        <div className="mb-3 flex flex-row gap-2 w-full">
+          <div className="w-full">
+            {data?.map((p: any, index: number) => {
+              return (
+                <div key={index}>
+                  {p?.type === "paragraphTitle" && (
+                    <input
+                      value={p?.translation}
+                      onChange={(e) => setTitleValue(e.target.value)}
+                      className="bg-gray-50 w-full p-2"
+                    />
+                  )}
+                  {p?.type === "paragraphBody" && (
+                    <textarea
+                      value={p?.translation}
+                      onChange={(e) => setBodyValue(e.target.value)}
+                      className="bg-gray-50 w-full p-2"
+                    />
+                  )}
                 </div>
-              ))} */}
+              );
+            })}
+          </div>
           <button className="w-[250px] bg-cyan-300 p-2 text-sm">
             Use this translation
           </button>

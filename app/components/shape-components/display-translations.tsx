@@ -36,13 +36,9 @@ const DisplayTranslations = ({
             <RichText key={translation.id} data={translation} item={item} />
           );
         })}
-      {paragraphTranslations &&
-        paragraphTranslations.map((translation: any) => {
-          return (
-            <ParagraphCollection key={translation.id} data={translation} item={item} />
-          );
-        })}
-        
+      {paragraphTranslations && (
+        <ParagraphCollection data={paragraphTranslations} item={item} />
+      )}
     </div>
   );
 };

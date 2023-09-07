@@ -15,7 +15,6 @@ function TranslationForm({
   item: any;
 }) {
   const [toLanguage, setToLanguage] = useState("");
-  const [prompt, setPrompt] = useState("");
   const [translations, setTranslations] = useState<any>([]);
   const [loading, setLoading] = useState(false);
 
@@ -73,16 +72,9 @@ function TranslationForm({
             );
           })}
         </select>
-        <input
-          type="text"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Enter text to translate"
-          className="border border-gray-300 p-2"
-        />
         <button
           onClick={handleTranslate}
-          className="bg-[#000] py-1 px-4 text-[#fff]"
+          className="bg-[#000] py-3 px-4 text-[#fff]"
         >
           Translate
         </button>
