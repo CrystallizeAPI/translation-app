@@ -2,7 +2,7 @@ export function createTranslateableObject(arr: any, language: string, toLanguage
     let messages = [
         {
             role: "user",
-            content: `Translate the text delimited by triple quotes from ${language} to ${toLanguage} and then create an object that contains the following - type, id, and translation.`,
+            content: `Translate the text delimited by triple quotes from ${language} to ${toLanguage} and then create an object that contains the following - type, id, and translation (where translation contains the translated text within the delimiters).`,
         },
     ]
     arr.map((item: any) => {
@@ -40,7 +40,7 @@ export function createTranslateableObject(arr: any, language: string, toLanguage
                     messages.push(
                         {
                             role: "user",
-                            content: `Type: paragraphImage\nId: ${item.id}\nKey: ${image.key}\nUrl: ${image.url}`
+                            content: `Type: paragraphImage\nId: ${item.id}\n\"\"\"${image.url}\"\"\"`
                         }
                     )
                 })

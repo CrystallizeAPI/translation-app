@@ -10,7 +10,7 @@ export const CopyButton = ({ text }: { text: string }) => {
   };
   return (
     <button className="bg-gray-100 py-2 px-4 text-sm" onClick={handleCopy}>
-      Copy
+      📋
     </button>
   );
 };

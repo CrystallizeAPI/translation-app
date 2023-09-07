@@ -21,7 +21,7 @@ const DisplayTranslations = ({
   const paragraphTranslations = translations?.filter((comp: any) => {
     return comp?.type?.startsWith("para");
   });
-
+  
   return (
     <div className="max-w-[800px] mx-auto flex flex-col gap-5">
       {singleLineTranslations &&
