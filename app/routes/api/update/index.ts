@@ -5,8 +5,6 @@ import { updateSingleLineComponent } from '~/use-cases/write/update-single-line-
 
 export const action: ActionFunction = async ({ request }) => {
     const body = await request.json();
-    console.log("body", body);
-
     try {
         switch (body.type) {
             case "singleLine":

@@ -10,24 +10,13 @@ const ParagraphCollection = ({
 }) => {
   const [titleValue, setTitleValue] = useState<any>("");
   const [bodyValue, setBodyValue] = useState<any>("");
+  const [paragraphValue, setParagraphValue] = useState<any>({});
+  let paragraphArr: any = [];
 
-  //   const handleClick = async (e: any) => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     try {
-  //       await fetch("/api/update", {
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //             id: item.id,
-  //             language: item.language,
-  //             componentId: data.id,
-  //             content: translation
-  //         })
-  //       })
-  //     } catch (error) {
-  //         console.log(error);
-  //     }
-  //   };
+  const handleClick = async (e: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   return (
     <div className="grid grid-cols-[160px_1fr] items-start">
@@ -54,11 +43,19 @@ const ParagraphCollection = ({
                       className="bg-gray-50 w-full p-2 h-[200px]"
                     />
                   )}
+                  {p?.type === "paragraphImage" && (
+                    <div className="w-32 rounded overflow-hidden shadow">
+                      <img src={p?.url} className="w-full " />
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
-          <button className="w-[250px] bg-cyan-300 p-2 text-sm">
+          <button
+            className="w-[250px] bg-cyan-300 p-2 text-sm"
+            onClick={handleClick}
+          >
             Use this translation
           </button>
         </div>

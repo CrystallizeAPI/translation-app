@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
-  createTranslateableObject,
-  translateUsingChatGpt,
+  createTranslateableObject
 } from "~/use-cases/translate-component";
 import DisplayTranslations from "./shape-components/display-translations";
 
@@ -45,7 +44,14 @@ function TranslationForm({
     e.preventDefault();
     e.stopPropagation();
     setLoading(true);
-    let translation = await translateUsingChatGpt(content);
+    let response = await fetch("/api/translate", {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+      }),
+    });
+
+    let translation = await response.json();
     translation = translation.replace("(\\\\n|\\\\r)", "");
     let translationArr = translation.split("\n\n");
     let jsonArr = translationArr.map((item: any) => {

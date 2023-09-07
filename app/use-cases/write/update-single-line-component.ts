@@ -8,15 +8,15 @@ export async function updateSingleLineComponent(itemId: string, language: string
                 $language: String!
                 $componentId: String!
                 $content: String
-            ) {
-                item {
-                updateComponent(
-                    itemId: $itemId
-                    language: $language
-                    input: { componentId: $componentId, singleLine: { text: $content } }
-                ) {
-                    id
-                  }
+            )   {
+                    item {
+                        updateComponent(
+                            itemId: $itemId
+                            language: $language
+                            input: { componentId: $componentId, singleLine: { text: $content } }
+                        ) {
+                        id
+                    }
                 }
             }
         `, {

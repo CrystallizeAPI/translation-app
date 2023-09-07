@@ -36,7 +36,7 @@ export async function getItemFromPath(path: string, language: string) {
                 images {
                   url
                   altText
-
+                  key
                 }
               }
             }
