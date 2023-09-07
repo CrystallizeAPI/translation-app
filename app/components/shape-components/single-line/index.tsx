@@ -1,3 +1,4 @@
+import { CopyButton } from "~/components/copy-button";
 import { componentType } from "../helpers";
 import { useState } from "react";
 
@@ -16,7 +17,6 @@ const SingleLine = ({
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("translation", translation)
     try {
       await fetch("/api/update", {
         method: "POST",
@@ -39,18 +39,21 @@ const SingleLine = ({
         {componentType["singleLine"]}
         {data?.id}
       </div>
-      <form className="flex flex-row gap-2">
+      <form className="flex flex-col gap-2">
         <input
           value={translation}
           className="bg-gray-50 w-full p-2"
           onChange={(e) => setTranslation(e.target.value)}
         />
-        <button
-          className="w-[250px] bg-cyan-300 p-2 text-sm"
-          onClick={handleClick}
-        >
-          Use this translation
-        </button>
+        <div className="flex flex-row gap-2 w-full justify-end mt-2">
+          <button
+            className="w-[250px] bg-cyan-300 p-2 text-sm"
+            onClick={handleClick}
+          >
+            Use this translation
+          </button>
+          <CopyButton text={translation} />
+        </div>
       </form>
     </div>
   );

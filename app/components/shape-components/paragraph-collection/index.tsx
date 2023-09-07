@@ -33,7 +33,6 @@ const ParagraphCollection = ({
     <div className="grid grid-cols-[160px_1fr] items-start">
       <div className="flex capitalize font-medium text-sm items-center gap-2">
         {componentType["paragraphCollection"]}
-        {data?.id}
       </div>
       <form>
         <div className="mb-3 flex flex-row gap-2 w-full">
@@ -52,7 +51,7 @@ const ParagraphCollection = ({
                     <textarea
                       value={p?.translation}
                       onChange={(e) => setBodyValue(e.target.value)}
-                      className="bg-gray-50 w-full p-2"
+                      className="bg-gray-50 w-full p-2 h-[200px]"
                     />
                   )}
                 </div>

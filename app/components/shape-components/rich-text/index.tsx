@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { componentType } from "../helpers";
+import { CopyButton } from "~/components/copy-button";
 
 const RichText = ({
   data,
@@ -24,9 +25,19 @@ const RichText = ({
           language: item.language,
           componentId: data.id,
           content: translation,
-          type: "richText"
+          type: "richText",
         }),
       });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCopy = async (e: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(translation);
     } catch (error) {
       console.log(error);
     }
@@ -38,18 +49,22 @@ const RichText = ({
         {componentType["richText"]}
         {data?.id}
       </div>
-      <form className="flex flex-row gap-2">
+      <form className="flex gap-2 flex-col">
         <textarea
           value={translation}
-          className="bg-gray-50 w-full p-2"
+          className="bg-gray-50 p-2 h-[200px] w-full"
           onChange={(e) => setTranslation(e.target.value)}
         />
-        <button
-          className="w-[250px] bg-cyan-300 p-2 text-sm"
-          onClick={handleClick}
-        >
-          Use this translation
-        </button>
+
+        <div className="flex flex-row gap-2 w-full justify-end mt-2">
+          <button
+            className="w-[250px] bg-cyan-300 p-2 text-sm"
+            onClick={handleClick}
+          >
+            Use this translation
+          </button>
+          <CopyButton text={translation} />
+        </div>
       </form>
     </div>
   );
