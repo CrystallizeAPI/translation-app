@@ -23,30 +23,29 @@ export function createTranslateableObject(arr: any, language: string, toLanguage
             )
         }
         if (item.type === "paragraphCollection") {
-            item.content.paragraphs.map((paragraph: any) => {
+            item.content.paragraphs.map((paragraph: any, index: number) => {
                 paragraph.title && messages.push(
                     {
                         role: "user",
-                        content: `Type: paragraphTitle\nId: ${item.id}\n\"\"\"${paragraph.title.text}\"\"\"`
+                        content: `Type: paragraphTitle${index}\nId: ${item.id}\n\"\"\"${paragraph.title.text}\"\"\"`
                     }
                 )
                 paragraph.body && messages.push(
                     {
                         role: "user",
-                        content: `Type: paragraphBody\nId: ${item.id}\n\"\"\"${paragraph.body.plainText.toString()}\"\"\"`
+                        content: `Type: paragraphBody${index}\nId: ${item.id}\n\"\"\"${paragraph.body.plainText.toString()}\"\"\"`
                     }
                 )
                 paragraph.images && paragraph.images.map((image: any) => {
                     messages.push(
                         {
                             role: "user",
-                            content: `Type: paragraphImage\nId: ${item.id}\n\"\"\"${image.url}\"\"\"`
+                            content: `Type: paragraphImage${index}\nId: ${item.id}\n\"\"\"${image.url}\"\"\"`
                         }
                     )
                 })
             })
         }
     })
-    
     return messages;
 }

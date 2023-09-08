@@ -21,7 +21,7 @@ export const action: ActionFunction = async ({ request }) => {
                     body.componentId,
                     body.content || ""
                 )
-            case "paragraph":
+            case "paragraphCollection":
                 await updateParagraphCollection(
                     body.id,
                     body.language,

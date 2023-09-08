@@ -1,5 +1,4 @@
 import { ActionFunction } from "@remix-run/node";
-import { json } from "remix-utils";
 
 export const action: ActionFunction = async ({ request }) => {
     const body = await request.json();
