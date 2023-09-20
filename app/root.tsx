@@ -19,7 +19,7 @@ export function links() {
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "SEO content validator",
+  title: "Translation app",
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -36,7 +36,7 @@ export default function App() {
       </head>
       <body>
         <Outlet />
-        <ScrollRestoration/>
+        <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>

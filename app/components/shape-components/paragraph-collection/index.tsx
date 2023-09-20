@@ -9,9 +9,6 @@ const ParagraphCollection = ({
   data: any;
   item: { id: string; language: string };
 }) => {
-  const [titleValue, setTitleValue] = useState<any>("");
-  const [bodyValue, setBodyValue] = useState<any>("");
-
   function groupAndTransformArray(arr: any[]) {
     const groupedData: any = {};
 
@@ -54,32 +51,36 @@ const ParagraphCollection = ({
 
   const resultArray = groupAndTransformArray(data);
 
-  const component = Object.entries(resultArray?.[0]).flat();
-
-  let requestBody = {
-    id: item.id,
-    language: item.language,
-    componentId: component[0],
-    content: component[1].map((p: any) => {
-      return {
-        title: { text: p?.title },
-        body: { html: p?.body },
-        images: p?.images.map((image: string) => {
-          return {key: image.split(".com/")[1]};
-        })
-      };
-    }),
-    type: "paragraphCollection",
-  };
+  const [paragraphData, setParagraphData] = useState<any>(resultArray);
 
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
 
     try {
-      await fetch("/api/update", {
-        method: "POST",
-        body: JSON.stringify(requestBody),
+      //run this for every item in paragraphData
+      paragraphData.map(async (paragraph: any) => {
+        const key = Object.keys(paragraph)[0];
+        const values = paragraph[key];
+        values.map(async (el: any) => {
+          const body = {
+            id: item.id,
+            language: item.language,
+            componentId: key,
+            content: {
+              title: { text: el?.title },
+              body: { html: el?.body },
+              images: el?.images.map((image: string) => {
+                return { key: image.split(".com/")[1] };
+              }),
+            },
+            type: "paragraphCollection",
+          };
+          await fetch("/api/update", {
+            method: "POST",
+            body: JSON.stringify(body),
+          });
+        });
       });
     } catch (error) {
       console.log(error);
@@ -93,52 +94,61 @@ const ParagraphCollection = ({
       </div>
       <form>
         <div className="mb-3 flex flex-col gap-2 w-full">
-          {resultArray.map((i: any, index: number) => (
-            <div key={index}>
-              {Object.values(i).map((el: any) => {
-                return el.map((p: any, index: number) => (
-                  <div key={index}>
-                    {p?.title && (
-                      <div className="w-full relative">
-                        <input
-                          value={p?.title}
-                          onChange={(e) => setTitleValue(e.target.value)}
-                          className="bg-gray-50 w-full p-2"
-                          readOnly
-                        />
-
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={p?.title} />
+          {paragraphData &&
+            paragraphData.map((item: any, index: number) => {
+              const key = Object.keys(item)[0];
+              const values = item[key];
+              return (
+                <div key={index}>
+                  {values.map((el: any, innerIndex: number) => {
+                    return (
+                      <div key={innerIndex}>
+                        <div className="w-full relative">
+                          <input
+                            value={el?.title}
+                            className="bg-gray-50 w-full p-2"
+                            onChange={(e) => {
+                              const newParagraphData = [...paragraphData];
+                              newParagraphData[index][key][innerIndex].title =
+                                e.target.value;
+                              setParagraphData(newParagraphData);
+                            }}
+                          />
+                          <div className="absolute right-1 top-2">
+                            <CopyButton text={el?.title} />
+                          </div>
                         </div>
+                        <div className="w-full relative">
+                          <textarea
+                            value={el?.body}
+                            className="bg-gray-50 w-full p-2 h-[200px]"
+                            onChange={(e) => {
+                              const newParagraphData = [...paragraphData];
+                              newParagraphData[index][key][innerIndex].body =
+                                e.target.value;
+                              setParagraphData(newParagraphData);
+                            }}
+                          />
+                          <div className="absolute right-1 top-2">
+                            <CopyButton text={el?.body} />
+                          </div>
+                        </div>
+                        {el?.images &&
+                          el?.images?.map((image: any, index: number) => (
+                            <div
+                              className="w-32 rounded overflow-hidden shadow"
+                              key={index}
+                            >
+                              <img src={image} className="w-full " />
+                            </div>
+                          ))}
                       </div>
-                    )}
+                    );
+                  })}
+                </div>
+              );
+            })}
 
-                    {p?.body && (
-                      <div className="w-full relative">
-                        <textarea
-                          value={p?.body}
-                          onChange={(e) => setBodyValue(e.target.value)}
-                          className="bg-gray-50 w-full p-2 h-[200px]"
-                          readOnly
-                        />
-
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={p?.body} />
-                        </div>
-                      </div>
-                    )}
-                    {p?.images &&
-                      p?.images?.map((image: any) => (
-                        <div className="w-32 rounded overflow-hidden shadow">
-                          <img src={image} className="w-full " />
-                        </div>
-                      ))}
-                  </div>
-                ));
-              })}
-            </div>
-          ))}
-          <div className="w-full"></div>
           <button
             className="w-full bg-cyan-300 p-2 text-sm h-50 mt-2"
             onClick={handleClick}

@@ -1,8 +1,8 @@
 import { apiClient } from "./shared";
 
 export async function getItemFromPath(path: string, language: string) {
-  const data = await apiClient.catalogueApi(
-    `#graphql
+    const data = await apiClient.catalogueApi(
+        `#graphql
           query ($path: String!, $version: VersionLabel, $language: String!) {
             catalogue(path: $path, language: $language, version:$version) {
               id
@@ -40,15 +40,34 @@ export async function getItemFromPath(path: string, language: string) {
                 }
               }
             }
+            ... on ContentChunkContent {
+                chunks {
+                  id
+                  content {
+                    ... on SingleLineContent {
+                      text
+                    }
+                    ... on RichTextContent {
+                      plainText
+                    }
+                    ... on ImageContent {
+                        images {
+                            url
+                            altText
+                            key
+                        }
+                    }
+                  }
+                }
+             }
           }
-
         `,
-    {
-      path: path || "/shop/sofas/arbour-eco",
-      version: "draft",
-      language: language || "en",
-    }
-  );
+        {
+            path: path || "/shop/sofas/arbour-eco",
+            version: "draft",
+            language: language || "en",
+        }
+    );
 
-  return { ...data };
+    return { ...data };
 }

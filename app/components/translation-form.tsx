@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import {
-  createTranslateableObject
-} from "~/use-cases/translate-component";
+import { createTranslateableObject } from "~/use-cases/translate-component";
 import DisplayTranslations from "./shape-components/display-translations";
 
 function TranslationForm({
@@ -34,8 +32,15 @@ function TranslationForm({
 
   const paragraphComponents = getComponentByType("paragraphCollection");
 
+  const contentChunkComponents = getComponentByType("contentChunk");
+
   const content = createTranslateableObject(
-    [singleLineComponents, richTextComponents, paragraphComponents].flat(),
+    [
+      singleLineComponents,
+      richTextComponents,
+      paragraphComponents,
+      contentChunkComponents,
+    ].flat(),
     language,
     toLanguage
   );
@@ -58,6 +63,7 @@ function TranslationForm({
       return JSON.parse(item);
     });
     setTranslations(jsonArr);
+    
     setLoading(false);
   };
 

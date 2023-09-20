@@ -4,4 +4,5 @@ export const componentType = {
   singleLine: <Icon.SingleLine />,
   richText: <Icon.RichText />,
   paragraphCollection: <Icon.ParagraphCollection />,
+  contentChunk: <Icon.Chunk />,
 };

@@ -1,6 +1,7 @@
 import SingleLine from "./single-line";
 import RichText from "./rich-text";
 import ParagraphCollection from "./paragraph-collection";
+import ContentChunk from "./content-chunk";
 
 const DisplayTranslations = ({
   translations,
@@ -16,12 +17,17 @@ const DisplayTranslations = ({
   };
 
   const singleLineTranslations = getComponentByType("singleLine");
+  
   const richTextTranslations = getComponentByType("richText");
 
   const paragraphTranslations = translations?.filter((comp: any) => {
     return comp?.type?.startsWith("para");
   });
-  
+
+  const contentChunkTranslations = translations?.filter((comp: any) => {
+    return comp?.type?.startsWith("contentChunk");
+  })
+
   return (
     <div className="max-w-[800px] mx-auto flex flex-col gap-5">
       {singleLineTranslations &&
@@ -39,6 +45,9 @@ const DisplayTranslations = ({
       {paragraphTranslations && (
         <ParagraphCollection data={paragraphTranslations} item={item} />
       )}
+        {contentChunkTranslations && (
+            <ContentChunk data={contentChunkTranslations} item={item} />
+        )}
     </div>
   );
 };
