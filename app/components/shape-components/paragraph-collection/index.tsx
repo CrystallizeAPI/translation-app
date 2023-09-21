@@ -88,76 +88,78 @@ const ParagraphCollection = ({
   };
 
   return (
-    <div className="grid grid-cols-[160px_1fr] items-start">
-      <div className="flex capitalize font-medium text-sm items-center gap-2">
-        {componentType["paragraphCollection"]}
-      </div>
-      <form>
-        <div className="mb-3 flex flex-col gap-2 w-full">
-          {paragraphData &&
-            paragraphData.map((item: any, index: number) => {
-              const key = Object.keys(item)[0];
-              const values = item[key];
-              return (
-                <div key={index}>
-                  {values.map((el: any, innerIndex: number) => {
-                    return (
-                      <div key={innerIndex}>
-                        <div className="w-full relative">
-                          <input
-                            value={el?.title}
-                            className="bg-gray-50 w-full p-2"
-                            onChange={(e) => {
-                              const newParagraphData = [...paragraphData];
-                              newParagraphData[index][key][innerIndex].title =
-                                e.target.value;
-                              setParagraphData(newParagraphData);
-                            }}
-                          />
-                          <div className="absolute right-1 top-2">
-                            <CopyButton text={el?.title} />
-                          </div>
-                        </div>
-                        <div className="w-full relative">
-                          <textarea
-                            value={el?.body}
-                            className="bg-gray-50 w-full p-2 h-[200px]"
-                            onChange={(e) => {
-                              const newParagraphData = [...paragraphData];
-                              newParagraphData[index][key][innerIndex].body =
-                                e.target.value;
-                              setParagraphData(newParagraphData);
-                            }}
-                          />
-                          <div className="absolute right-1 top-2">
-                            <CopyButton text={el?.body} />
-                          </div>
-                        </div>
-                        {el?.images &&
-                          el?.images?.map((image: any, index: number) => (
-                            <div
-                              className="w-32 rounded overflow-hidden shadow"
-                              key={index}
-                            >
-                              <img src={image} className="w-full " />
-                            </div>
-                          ))}
-                      </div>
-                    );
-                  })}
+    <form>
+      <div className="mb-3 flex flex-col gap-2 w-full">
+        {paragraphData &&
+          paragraphData.map((item: any, index: number) => {
+            const key = Object.keys(item)[0];
+            const values = item[key];
+            return (
+              <div
+                key={index}
+                className="grid grid-cols-[160px_1fr] items-start"
+              >
+                <div className="flex capitalize font-medium text-sm gap-2">
+                  {componentType["paragraphCollection"]}
+                  <p>{key}</p>
                 </div>
-              );
-            })}
+                {values.map((el: any, innerIndex: number) => {
+                  return (
+                    <div key={innerIndex} className="w-full">
+                      <div className="relative">
+                        <input
+                          value={el?.title}
+                          className="bg-gray-50 w-full p-2"
+                          onChange={(e) => {
+                            const newParagraphData = [...paragraphData];
+                            newParagraphData[index][key][innerIndex].title =
+                              e.target.value;
+                            setParagraphData(newParagraphData);
+                          }}
+                        />
+                        <div className="absolute right-1 top-2">
+                          <CopyButton text={el?.title} />
+                        </div>
+                      </div>
+                      <div className="w-full relative">
+                        <textarea
+                          value={el?.body}
+                          className="bg-gray-50 w-full p-2 h-[200px]"
+                          onChange={(e) => {
+                            const newParagraphData = [...paragraphData];
+                            newParagraphData[index][key][innerIndex].body =
+                              e.target.value;
+                            setParagraphData(newParagraphData);
+                          }}
+                        />
+                        <div className="absolute right-1 top-2">
+                          <CopyButton text={el?.body} />
+                        </div>
+                      </div>
+                      {el?.images &&
+                        el?.images?.map((image: any, index: number) => (
+                          <div
+                            className="w-32 rounded overflow-hidden shadow"
+                            key={index}
+                          >
+                            <img src={image} className="w-full " />
+                          </div>
+                        ))}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
 
-          <button
-            className="w-full bg-cyan-300 p-2 text-sm h-50 mt-2"
-            onClick={handleClick}
-          >
-            Use this translation
-          </button>
-        </div>
-      </form>
-    </div>
+        <button
+          className="bg-cyan-300 p-2 text-sm h-50 mt-2 w-[250px] self-end"
+          onClick={handleClick}
+        >
+          Use this translation
+        </button>
+      </div>
+    </form>
   );
 };
 

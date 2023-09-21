@@ -85,68 +85,73 @@ const ContentChunk = ({
   };
 
   return (
-    <div className="grid grid-cols-[160px_1fr] items-start">
-      <div className="flex capitalize font-medium text-sm items-center gap-2">
-        {componentType["contentChunk"]}
-      </div>
-      <form>
+    <form>
+      <div className="mb-3 flex flex-col gap-2 w-full">
         {chunkData &&
           chunkData.map((item: any, index: number) => {
             const key = Object.keys(item)[0];
             const values = item[key];
-            console.log("values", values);
             return (
-              <div key={index}>
-                {values.map((value: any, innerIndex: any) => (
-                  <div key={innerIndex}>
-                    {value?.singleLine && (
-                      <div className="w-full relative">
-                        <input
-                          value={value?.singleLine}
-                          className="bg-gray-50 w-full p-2"
-                          onChange={(e) => {
-                            const newChunkData = [...chunkData];
-                            newChunkData[index][key][innerIndex].singleLine =
-                              e.target.value;
-                            setChunkData(newChunkData);
-                          }}
-                        />
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={value?.singleLine} />
+              <div
+                key={index}
+                className="grid grid-cols-[160px_1fr] items-start"
+              >
+                <div className="flex capitalize font-medium text-sm gap-2">
+                  {componentType["contentChunk"]}
+                  <p>{key}</p>
+                </div>
+                <div className="w-full">
+                  {values.map((value: any, innerIndex: any) => (
+                    <div key={innerIndex}>
+                      {value?.singleLine && (
+                        <div className="w-full relative">
+                          <input
+                            value={value?.singleLine}
+                            className="bg-gray-50 w-full p-2"
+                            onChange={(e) => {
+                              const newChunkData = [...chunkData];
+                              newChunkData[index][key][innerIndex].singleLine =
+                                e.target.value;
+                              setChunkData(newChunkData);
+                            }}
+                          />
+                          <div className="absolute right-1 top-2">
+                            <CopyButton text={value?.singleLine} />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {value?.richText && (
-                      <div className="w-full relative">
-                        <textarea
-                          value={value?.richText}
-                          className="bg-gray-50 w-full p-2 h-[200px]"
-                          onChange={(e) => {
-                            const newChunkData = [...chunkData];
-                            newChunkData[index][key][innerIndex].richText =
-                              e.target.value;
-                            setChunkData(newChunkData);
-                          }}
-                        />
+                      )}
+                      {value?.richText && (
+                        <div className="w-full relative">
+                          <textarea
+                            value={value?.richText}
+                            className="bg-gray-50 w-full p-2 h-[200px]"
+                            onChange={(e) => {
+                              const newChunkData = [...chunkData];
+                              newChunkData[index][key][innerIndex].richText =
+                                e.target.value;
+                              setChunkData(newChunkData);
+                            }}
+                          />
 
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={value?.richText} />
+                          <div className="absolute right-1 top-2">
+                            <CopyButton text={value?.richText} />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })}
         <button
-          className="w-full bg-cyan-300 p-2 text-sm h-50 mt-2"
+          className="w-[250px] self-end bg-cyan-300 p-2 text-sm h-50 mt-2"
           onClick={handleClick}
         >
           Use this translation
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 };
 
