@@ -17,7 +17,7 @@ const DisplayTranslations = ({
   };
 
   const singleLineTranslations = getComponentByType("singleLine");
-  
+
   const richTextTranslations = getComponentByType("richText");
 
   const paragraphTranslations = translations?.filter((comp: any) => {
@@ -26,10 +26,10 @@ const DisplayTranslations = ({
 
   const contentChunkTranslations = translations?.filter((comp: any) => {
     return comp?.type?.startsWith("contentChunk");
-  })
+  });
 
   return (
-    <div className="max-w-[800px] mx-auto flex flex-col gap-5">
+    <div className="max-w-[1200px] mx-auto flex flex-col gap-5">
       {singleLineTranslations &&
         singleLineTranslations.map((translation: any) => {
           return (
@@ -45,9 +45,9 @@ const DisplayTranslations = ({
       {paragraphTranslations && (
         <ParagraphCollection data={paragraphTranslations} item={item} />
       )}
-        {contentChunkTranslations && (
-            <ContentChunk data={contentChunkTranslations} item={item} />
-        )}
+      {contentChunkTranslations && (
+        <ContentChunk data={contentChunkTranslations} item={item} />
+      )}
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { componentType } from "../helpers";
 import { CopyButton } from "~/components/copy-button";
+import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
+import TextareaAutosize from "react-textarea-autosize";
 
 const ParagraphCollection = ({
   data,
@@ -95,69 +97,75 @@ const ParagraphCollection = ({
             const key = Object.keys(item)[0];
             const values = item[key];
             return (
-              <div
-                key={index}
-                className="grid grid-cols-[160px_1fr] items-start"
-              >
-                <div className="flex capitalize font-medium text-sm gap-2">
-                  {componentType["paragraphCollection"]}
-                  <p>{key}</p>
+              <div key={index} className="">
+                <div className="flex  items-center gap-2 justify-between pr-4">
+                  <div className="flex capitalize font-medium text-sm gap-2 ">
+                    {componentType["paragraphCollection"]}
+                    <p>{key}</p>
+                  </div>
+                  <Tooltip content="Add paragraph collection translation to draft">
+                    <IconButton variant="elevate" onClick={handleClick}>
+                      <Icon.Rocket width="24" height="24" />
+                    </IconButton>
+                  </Tooltip>
                 </div>
-                {values.map((el: any, innerIndex: number) => {
-                  return (
-                    <div key={innerIndex} className="w-full">
-                      <div className="relative">
-                        <input
-                          value={el?.title}
-                          className="bg-gray-50 w-full p-2"
-                          onChange={(e) => {
-                            const newParagraphData = [...paragraphData];
-                            newParagraphData[index][key][innerIndex].title =
-                              e.target.value;
-                            setParagraphData(newParagraphData);
-                          }}
-                        />
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={el?.title} />
-                        </div>
-                      </div>
-                      <div className="w-full relative">
-                        <textarea
-                          value={el?.body}
-                          className="bg-gray-50 w-full p-2 h-[200px]"
-                          onChange={(e) => {
-                            const newParagraphData = [...paragraphData];
-                            newParagraphData[index][key][innerIndex].body =
-                              e.target.value;
-                            setParagraphData(newParagraphData);
-                          }}
-                        />
-                        <div className="absolute right-1 top-2">
-                          <CopyButton text={el?.body} />
-                        </div>
-                      </div>
-                      {el?.images &&
-                        el?.images?.map((image: any, index: number) => (
-                          <div
-                            className="w-32 rounded overflow-hidden shadow"
-                            key={index}
-                          >
-                            <img src={image} className="w-full " />
+                <div className="mt-2">
+                  {values.map((el: any, innerIndex: number) => {
+                    return (
+                      <div
+                        key={innerIndex}
+                        className="w-full bg-[#fff] rounded-md shadow overflow-hidden mb-4 "
+                      >
+                        <div className="relative flex justify-between items-center">
+                          <input
+                            value={el?.title}
+                            placeholder="Paragraph Collection title"
+                            className="w-full text-lg font-medium px-6 pt-6 pb-2 placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-purple-200"
+                            onChange={(e) => {
+                              const newParagraphData = [...paragraphData];
+                              newParagraphData[index][key][innerIndex].title =
+                                e.target.value;
+                              setParagraphData(newParagraphData);
+                            }}
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
+                            <CopyButton text={el?.title} variant="default" />
                           </div>
-                        ))}
-                    </div>
-                  );
-                })}
+                        </div>
+                        <div className="w-full relative flex">
+                          <TextareaAutosize
+                            value={el?.body}
+                            placeholder="Paragraph collection body"
+                            className="bg-white pl-6 py-2 pr-12 min-h-[140px]  text-base w-full focus:outline-purple-200"
+                            onChange={(e) => {
+                              const newParagraphData = [...paragraphData];
+                              newParagraphData[index][key][innerIndex].body =
+                                e.target.value;
+                              setParagraphData(newParagraphData);
+                            }}
+                          />
+                          <div className="absolute right-4 top-3 ">
+                            <CopyButton text={el?.body} variant="default" />
+                          </div>
+                        </div>
+                        <div className="px-6 py-6">
+                          {el?.images &&
+                            el?.images?.map((image: any, index: number) => (
+                              <div
+                                className="w-32 rounded overflow-hidden shadow"
+                                key={index}
+                              >
+                                <img src={image} className="w-full " />
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
-
-        <button
-          className="bg-cyan-300 p-2 text-sm h-50 mt-2 w-[250px] self-end"
-          onClick={handleClick}
-        >
-          Use this translation
-        </button>
       </div>
     </form>
   );
