@@ -1,18 +1,23 @@
 import { CopyButton } from "~/components/copy-button";
 import { componentType } from "../helpers";
 import { useState } from "react";
+import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 
 const SingleLine = ({
   data,
   item,
 }: {
-  data: any;
+  data: {
+    id: string;
+    type: string;
+    translation: string;
+  };
   item: {
     id: string;
     language: string;
   };
 }) => {
-  const [translation, setTranslation] = useState<any>(data.translation);
+  const [translation, setTranslation] = useState<any>(data?.translation);
 
   const handleClick = async (e: any) => {
     e.preventDefault();
@@ -34,24 +39,29 @@ const SingleLine = ({
   };
 
   return (
-    <div className="grid grid-cols-[160px_1fr] items-start">
-      <div className="flex capitalize font-medium text-sm items-center gap-2">
-        {componentType["singleLine"]}
-        {data?.id}
+    <div className="items-start">
+      <div className="flex items-center gap-2 justify-between pr-4">
+        <div className="flex capitalize items-center  font-medium text-sm gap-2">
+          {componentType["singleLine"]}
+          {data?.id}
+        </div>
+        <div>
+          <div className="flex flex-row gap-2 w-full justify-end mt-2">
+            <Tooltip content="Add this translation to draft">
+              <IconButton variant="elevate" onClick={handleClick}>
+                <Icon.Rocket width="24" height="24" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </div>
       </div>
-      <form className="flex flex-col gap-2">
+      <form className="gap-2 pt-2 relative">
         <input
           value={translation}
-          className="bg-gray-50 w-full p-2"
+          className="bg-white px-6 py-4 rounded-md shadow text-base font-medium w-full focus:outline-purple-200"
           onChange={(e) => setTranslation(e.target.value)}
         />
-        <div className="flex flex-row gap-2 w-full justify-end mt-2">
-          <button
-            className="w-[250px] bg-cyan-300 p-2 text-sm"
-            onClick={handleClick}
-          >
-            Use this translation
-          </button>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
           <CopyButton text={translation} />
         </div>
       </form>

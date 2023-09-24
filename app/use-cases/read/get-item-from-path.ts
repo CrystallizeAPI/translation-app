@@ -1,4 +1,4 @@
-import { apiClient } from "./shared";
+import { apiClient } from "../shared";
 
 export async function getItemFromPath(path: string, language: string) {
     const data = await apiClient.catalogueApi(
@@ -43,6 +43,7 @@ export async function getItemFromPath(path: string, language: string) {
             ... on ContentChunkContent {
                 chunks {
                   id
+                  type
                   content {
                     ... on SingleLineContent {
                       text

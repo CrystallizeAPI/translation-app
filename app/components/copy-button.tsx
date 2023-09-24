@@ -1,4 +1,11 @@
-export const CopyButton = ({ text }: { text: string }) => {
+import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
+export const CopyButton = ({
+  text,
+  variant = "elevate",
+}: {
+  text: string;
+  variant?: "elevate" | "default";
+}) => {
   const handleCopy = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
@@ -9,8 +16,10 @@ export const CopyButton = ({ text }: { text: string }) => {
     }
   };
   return (
-    <button className="bg-gray-100 py-2 px-4 text-sm" onClick={handleCopy}>
-      📋
-    </button>
+    <Tooltip content="Copy to clipboard">
+      <IconButton variant={variant} onClick={handleCopy}>
+        <Icon.Copy />
+      </IconButton>
+    </Tooltip>
   );
 };

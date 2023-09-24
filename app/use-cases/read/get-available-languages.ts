@@ -1,4 +1,4 @@
-import { apiClient } from "./shared";
+import { apiClient } from "../shared";
 
 export async function getAvailableLanguages() {
     const data = await apiClient.pimApi(

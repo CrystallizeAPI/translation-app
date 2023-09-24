@@ -29,7 +29,7 @@ const DisplayTranslations = ({
   })
 
   return (
-    <div className="max-w-[800px] mx-auto flex flex-col gap-5">
+    <div className="max-w-[1200px] mx-auto flex flex-col gap-5">
       {singleLineTranslations &&
         singleLineTranslations.map((translation: any) => {
           return (
