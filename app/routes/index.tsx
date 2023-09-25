@@ -22,12 +22,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function Index() {
   const { item, language, availableLanguages } = useLoaderData();
   return (
-    <>
+    <div className="bg-gray-50">
       <TranslationForm
         language={language}
         availableLanguages={availableLanguages}
         item={item}
       />
-    </>
+    </div>
   );
 }
