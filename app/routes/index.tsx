@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     item: data.catalogue,
-    language: itemLanguageCode || "en",
+    language: itemLanguageCode,
     availableLanguages,
   });
 };
