@@ -3,8 +3,8 @@ import { apiClient } from "../shared";
 export async function updateContentChunk(itemId: string, language: string, componentId: string, content: any) {
     
     const itemsToUpdate = [
-        content?.singleLine && { singleLine: { text: content?.singleLine }, componentId: content.id },
-        content?.richText && { richText: { html: content?.richText }, componentId: content.id },
+        content?.type === "singleLine" && { singleLine: { text: content?.translation }, componentId: content.id },
+        content?.type === "richText" && { richText: { html: content?.translation }, componentId: content.id },
     ].filter(Boolean);
 
     const data = await apiClient.pimApi(

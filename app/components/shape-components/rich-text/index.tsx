@@ -8,13 +8,17 @@ const RichText = ({
   data,
   item,
 }: {
-  data: any;
+  data: {
+    id: string;
+    type: string;
+    translation: string;
+  };
   item: {
     id: string;
     language: string;
   };
 }) => {
-  const [translation, setTranslation] = useState<any>(data.translation);
+  const [translation, setTranslation] = useState<any>(data?.translation);
 
   const handleClick = async (e: any) => {
     e.preventDefault();

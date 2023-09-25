@@ -6,13 +6,17 @@ const SingleLine = ({
   data,
   item,
 }: {
-  data: any;
+  data: {
+    id: string;
+    type: string;
+    translation: string;
+  };
   item: {
     id: string;
     language: string;
   };
 }) => {
-  const [translation, setTranslation] = useState<any>(data.translation);
+  const [translation, setTranslation] = useState<any>(data?.translation);
 
   const handleClick = async (e: any) => {
     e.preventDefault();
@@ -35,7 +39,7 @@ const SingleLine = ({
 
   return (
     <div className="items-start">
-      <div className="flex  items-center gap-2 justify-between pr-4">
+      <div className="flex items-center gap-2 justify-between pr-4">
         <div className="flex capitalize items-center  font-medium text-sm gap-2">
           {componentType["singleLine"]}
           {data?.id}

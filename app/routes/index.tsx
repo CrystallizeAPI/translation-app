@@ -1,9 +1,7 @@
 import { json, LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import ShapeComponents from "../components/shape-components";
-
-import { getItemFromPath } from "~/use-cases/get-item-from-path";
-import { getAvailableLanguages } from "~/use-cases/get-available-languages";
+import { getItemFromPath } from "~/use-cases/read/get-item-from-path";
+import { getAvailableLanguages } from "~/use-cases/read/get-available-languages";
 import TranslationForm from "~/components/translation-form";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -25,7 +23,11 @@ export default function Index() {
   const { item, language, availableLanguages } = useLoaderData();
   return (
     <>
-      <TranslationForm  language={language} availableLanguages={availableLanguages} item={item}/>
+      <TranslationForm
+        language={language}
+        availableLanguages={availableLanguages}
+        item={item}
+      />
     </>
   );
 }
