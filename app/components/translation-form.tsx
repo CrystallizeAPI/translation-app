@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import { translateArray } from "~/use-cases/fetch-translation";
 import SingleLine from "./shape-components/single-line";
 import { Button, DropdownMenu, Icon } from "@crystallize/design-system";
@@ -81,7 +81,7 @@ function TranslationForm({
     setLoading(false);
   };
   return (
-    <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto ">
+    <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
       <div className="py-8 flex flex-col gap-5">
         <div className="border-solid border-0 border-b border-gray-200">
           <div className="w-full">
