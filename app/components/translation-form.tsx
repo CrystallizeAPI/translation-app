@@ -131,27 +131,21 @@ function TranslationForm({
         </div>
       </div>
       <div className="px-12 mt-8">
-        <Suspense fallback={<h2>Fetching single line...</h2>}>
-          {singleLineTranslations &&
-            singleLineTranslations.map((i: any) => (
-              <SingleLine key={i.id} data={i} item={itemData} />
-            ))}
-        </Suspense>
-        <Suspense fallback={<h2>Fetching rich text...</h2>}>
-          {richTextTranslations &&
-            richTextTranslations.map((i: any) => (
-              <RichText key={i.id} data={i} item={itemData} />
-            ))}
-        </Suspense>
-        <Suspense fallback={<h2>Translating paragraph collection</h2>}>
-          {paragraphCollectionTranslations &&
-            paragraphCollectionTranslations.map((i: any) => (
-              <ParagraphCollection key={i.id} data={i} item={itemData} />
-            ))}
-        </Suspense>
+        {singleLineTranslations &&
+          singleLineTranslations.map((i: any) => (
+            <SingleLine key={i.id} data={i} item={itemData} />
+          ))}
+
+        {richTextTranslations &&
+          richTextTranslations.map((i: any) => (
+            <RichText key={i.id} data={i} item={itemData} />
+          ))}
+        {paragraphCollectionTranslations &&
+          paragraphCollectionTranslations.map((i: any) => (
+            <ParagraphCollection key={i.id} data={i} item={itemData} />
+          ))}
         {contentChunkTranslations &&
           contentChunkTranslations.map((i: any) => {
-            console.log("i", i);
             return <ContentChunk key={i.id} data={i} item={itemData} />;
           })}
       </div>

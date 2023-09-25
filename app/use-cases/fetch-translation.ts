@@ -68,6 +68,15 @@ export const contentChunkTranslation = async (component: any, language: string, 
                     };
                     data.chunks.push(comp);
                     break;
+                case "richText" && item.content:
+                    const richTranslation = await fetchTranslation(item.content.plainText.toString(), language, toLanguage);
+                    const richComp = {
+                        id: item.id,
+                        type: "richText",
+                        translation: await richTranslation.text(),
+                    };
+                    data.chunks.push(richComp);
+                    break;
                 default:
                     break;
             }
