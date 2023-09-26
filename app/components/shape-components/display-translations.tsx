@@ -6,49 +6,30 @@ import ContentChunk from "./content-chunk";
 const DisplayTranslations = ({
   translations,
   item,
+  type,
 }: {
   translations: any;
   item: { id: string; language: string };
+  type: string;
 }) => {
-  const getComponentByType = (type: string) => {
-    return translations?.filter((comp: any) => {
-      return comp.type === type;
-    });
-  };
-
-  const singleLineTranslations = getComponentByType("singleLine");
-
-  const richTextTranslations = getComponentByType("richText");
-
-  const paragraphTranslations = translations?.filter((comp: any) => {
-    return comp?.type?.startsWith("para");
-  });
-
-  const contentChunkTranslations = translations?.filter((comp: any) => {
-    return comp?.type?.startsWith("contentChunk");
-  });
-
   return (
-    <div className="max-w-[1200px] mx-auto flex flex-col gap-5">
-      {singleLineTranslations &&
-        singleLineTranslations.map((translation: any) => {
-          return (
-            <SingleLine key={translation.id} data={translation} item={item} />
-          );
+    <>
+      {translations &&
+        translations.map((i: any) => {
+          switch (type) {
+            case "singleLine":
+              return <SingleLine key={i.id} data={i} item={item} />;
+            case "richText":
+              return <RichText key={i.id} data={i} item={item} />;
+            case "paragraphCollection":
+              return <ParagraphCollection key={i.id} data={i} item={item} />;
+            case "contentChunk":
+              return <ContentChunk key={i.id} data={i} item={item} />;
+            default:
+              return null;
+          }
         })}
-      {richTextTranslations &&
-        richTextTranslations.map((translation: any) => {
-          return (
-            <RichText key={translation.id} data={translation} item={item} />
-          );
-        })}
-      {paragraphTranslations && (
-        <ParagraphCollection data={paragraphTranslations} item={item} />
-      )}
-      {contentChunkTranslations && (
-        <ContentChunk data={contentChunkTranslations} item={item} />
-      )}
-    </div>
+    </>
   );
 };
 

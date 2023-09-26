@@ -5,6 +5,7 @@ import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 const SingleLine = ({
   data,
   item,
+  setEditedTranslation,
 }: {
   data: {
     id: string;
@@ -15,9 +16,8 @@ const SingleLine = ({
     id: string;
     language: string;
   };
+  setEditedTranslation: any;
 }) => {
-  const [translation, setTranslation] = useState<any>(data?.translation);
-
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
@@ -28,13 +28,21 @@ const SingleLine = ({
           id: item.id,
           language: item.language,
           componentId: data.id,
-          content: translation,
+          content: data?.translation,
           type: "singleLine",
         }),
       });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const onChange = (e: any) => {
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) =>
+        i.id === data.id ? { ...i, translation: e.target.value } : i
+      );
+    });
   };
 
   return (
@@ -56,12 +64,12 @@ const SingleLine = ({
       </div>
       <form className="gap-2 pt-2 relative">
         <input
-          value={translation}
+          value={data?.translation}
           className="bg-white px-6 py-4 rounded-md shadow text-base font-medium w-full focus:outline-purple-200"
-          onChange={(e) => setTranslation(e.target.value)}
+          onChange={(e) => onChange(e)}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
-          <CopyButton text={translation} />
+          <CopyButton text={data?.translation} />
         </div>
       </form>
     </div>

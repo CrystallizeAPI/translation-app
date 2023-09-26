@@ -1,8 +1,9 @@
 import { apiClient } from "../shared";
 
-export async function updateParagraphCollection(itemId: string, language: string, componentId: string, content: string) {
-    const data = await apiClient.pimApi(
-        `#graphql
+export async function updateParagraphCollection(itemId: string, language: string, componentId: string, content: any) {
+    try {
+        const data = await apiClient.pimApi(
+            `#graphql
                 mutation(
                     $itemId: ID!
                     $language: String!
@@ -19,16 +20,19 @@ export async function updateParagraphCollection(itemId: string, language: string
                         }
                     ) {
                         id
-                    }
-                  }
+                     }
+                   }
                 }
-          
-            `, {
-        itemId,
-        language,
-        componentId,
-        content
+              
+                `, {
+            itemId,
+            language,
+            componentId,
+            content
+        }
+        )
+        return data.item.updateComponent;
+    } catch (e) {
+        console.log(e)
     }
-    )
-    return data.item.updateComponent;
 }

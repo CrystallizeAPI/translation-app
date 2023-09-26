@@ -7,20 +7,20 @@ import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 const ContentChunk = ({
   data,
   item,
+  setEditedTranslation
 }: {
   data: any;
   item: { id: string; language: string };
+  setEditedTranslation: any;
 }) => {
-  const [chunkData, setChunkData] = useState<any>(data);
-
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    chunkData?.chunks?.map(async (chunk: any) => {
+    data?.chunks?.map(async (chunk: any) => {
         const body = {
             id: item.id,
             language: item.language,
-            componentId: chunkData.id,
+            componentId: data.id,
             content: chunk,
             type: "contentChunk",
         };
@@ -30,18 +30,26 @@ const ContentChunk = ({
         });
     })
   };
+
+  const onChange = (e: any, index: number, type: string) => {
+    const newParagraphData = { ...data };
+    newParagraphData.chunks[index].translation = e.target.value;
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) => (i.id === data.id ? newParagraphData : i));
+    });
+  }
   
   return (
     <form>
       <div className="mb-3 flex flex-col w-full bg-s-purple-100 pl-4 rounded-md">
-        {chunkData?.chunks &&
-          chunkData?.chunks?.map((chunk: any, index: number) => {
+        {data?.chunks &&
+          data?.chunks?.map((chunk: any, index: number) => {
             return (
               <div key={index}>
                 <div className="flex  items-center gap-2 justify-between pt-3 pb-2 pr-4">
                   <div className="flex capitalize font-medium text-sm gap-2">
                     {componentType["contentChunk"]}
-                    <p>{chunkData?.id}</p>
+                    <p>{data?.id}</p>
                   </div>
                   <Tooltip content="Add this translation to draft">
                     <IconButton variant="elevate" onClick={handleClick}>
@@ -55,11 +63,7 @@ const ContentChunk = ({
                       <input
                         value={chunk?.translation}
                         className="bg-white px-6 py-4   text-base font-medium w-full focus:outline-purple-200 pr-8"
-                        onChange={(e) => {
-                            const newChunkData = { ...chunkData };
-                            newChunkData.chunks[index].translation = e.target.value;
-                            setChunkData(newChunkData);
-                        }}
+                        onChange={(e) => onChange(e, index, "")}
                       />
                       <div className="absolute right-4 top-1/2 -translate-y-1/2">
                         <CopyButton text={chunk?.content?.text} />

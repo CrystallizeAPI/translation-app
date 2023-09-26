@@ -1,34 +1,34 @@
 import { useState } from "react";
 import { componentType } from "../helpers";
 import { CopyButton } from "~/components/copy-button";
-import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
+import { IconButton, Icon, Tooltip, Button } from "@crystallize/design-system";
 import TextareaAutosize from "react-textarea-autosize";
 
 const ParagraphCollection = ({
   data,
   item,
+  setEditedTranslation,
 }: {
   data: any;
   item: { id: string; language: string };
+  setEditedTranslation: any;
 }) => {
-  const [paragraphData, setParagraphData] = useState<any>(data);
-
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
 
     try {
-      paragraphData.paragraphs.map(async (paragraph: any) => {
+      data.paragraphs.map(async (paragraph: any) => {
         const body = {
           id: item.id,
           language: item.language,
-          componentId: paragraphData.id,
+          componentId: data.id,
           content: {
-            title: { text: paragraph.title },
-            body: { html: paragraph.body },
+            title: { text: paragraph.title || ""},
+            body: { html: paragraph.body || ""},
             images: paragraph.images.map((image: any) => {
               return { key: image.key };
-            }),
+            }) || [],
           },
           type: "paragraphCollection",
         };
@@ -41,6 +41,14 @@ const ParagraphCollection = ({
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const onChange = (e: any, index: number, type: string) => {
+    const newParagraphData = { ...data };
+    newParagraphData.paragraphs[index][type] = e.target.value;
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) => (i.id === data.id ? newParagraphData : i));
+    });
   };
 
   return (
@@ -58,7 +66,7 @@ const ParagraphCollection = ({
           </Tooltip>
         </div>
         <div className="mt-2">
-          {paragraphData?.paragraphs?.map((el: any, innerIndex: number) => {
+          {data?.paragraphs?.map((el: any, innerIndex: number) => {
             return (
               <div
                 key={innerIndex}
@@ -69,12 +77,7 @@ const ParagraphCollection = ({
                     value={el?.title}
                     placeholder="Paragraph Collection title"
                     className="w-full text-lg font-medium px-6 pt-6 pb-2 placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-purple-200"
-                    onChange={(e) => {
-                      const newParagraphData = { ...paragraphData };
-                      newParagraphData.paragraphs[innerIndex].title =
-                        e.target.value;
-                      setParagraphData(newParagraphData);
-                    }}
+                    onChange={(e) => onChange(e, innerIndex, "title")}
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
                     <CopyButton text={el?.title} variant="default" />
@@ -85,12 +88,7 @@ const ParagraphCollection = ({
                     value={el?.body}
                     placeholder="Paragraph collection body"
                     className="bg-white pl-6 py-2 pr-12 min-h-[140px]  text-base w-full focus:outline-purple-200"
-                    onChange={(e) => {
-                      const newParagraphData = { ...paragraphData };
-                      newParagraphData.paragraphs[innerIndex].body =
-                        e.target.value;
-                      setParagraphData(newParagraphData);
-                    }}
+                    onChange={(e) => onChange(e, innerIndex, "body")}
                   />
                   <div className="absolute right-4 top-3 ">
                     <CopyButton text={el?.body} variant="default" />

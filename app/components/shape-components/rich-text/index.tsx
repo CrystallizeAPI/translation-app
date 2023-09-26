@@ -7,6 +7,7 @@ import TextareaAutosize from "react-textarea-autosize";
 const RichText = ({
   data,
   item,
+  setEditedTranslation,
 }: {
   data: {
     id: string;
@@ -17,9 +18,8 @@ const RichText = ({
     id: string;
     language: string;
   };
+  setEditedTranslation: any;
 }) => {
-  const [translation, setTranslation] = useState<any>(data?.translation);
-
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
@@ -30,13 +30,21 @@ const RichText = ({
           id: item.id,
           language: item.language,
           componentId: data.id,
-          content: translation,
+          content: data?.translation,
           type: "richText",
         }),
       });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const onChange = (e: any) => {
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) =>
+        i.id === data.id ? { ...i, translation: e.target.value } : i
+      );
+    });
   };
 
   return (
@@ -56,12 +64,12 @@ const RichText = ({
       </div>
       <form className="w-full relative">
         <TextareaAutosize
-          value={translation}
+          value={data?.translation}
           className="bg-white px-6 pr-8 py-4 min-h-[140px] rounded-md shadow text-base w-full focus:outline-purple-200"
-          onChange={(e) => setTranslation(e.target.value)}
+          onChange={(e) => onChange(e)}
         />
         <div className="absolute right-4 top-3 ">
-          <CopyButton text={translation} />
+          <CopyButton text={data?.translation} />
         </div>
       </form>
     </div>
