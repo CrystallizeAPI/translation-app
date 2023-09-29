@@ -3,8 +3,7 @@ export const fetchTranslation = async (text: string, language: string, toLanguag
         method: "POST",
         body: JSON.stringify({
             role: "user",
-            content:
-                `Translate the following text from ${language}  to ${toLanguage}: ${text}`,
+            content: `Translate the text delimited by triple quotes from ${language} to ${toLanguage}. The returned translation should contain no quotes.\n\n\"\"\"${text}\"\"\"`
         }),
     });
 }
