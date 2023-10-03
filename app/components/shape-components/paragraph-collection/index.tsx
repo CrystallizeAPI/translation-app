@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { componentType } from "../helpers";
 import { CopyButton } from "~/components/copy-button";
-import { IconButton, Icon, Tooltip, Button } from "@crystallize/design-system";
+import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 import TextareaAutosize from "react-textarea-autosize";
 
 const ParagraphCollection = ({

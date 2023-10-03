@@ -8,6 +8,21 @@ export async function getItemFromPath(path: string, language: string) {
               id
               name
               path
+              ... on Product {
+                variants {
+                  id
+                  name
+                  sku
+                  components {
+                    id
+                    name
+                    type
+                    content {
+                      ...componentsContent
+                    }
+                  }
+                }
+              }
               components {
                 id
                 name
@@ -37,6 +52,20 @@ export async function getItemFromPath(path: string, language: string) {
                   url
                   altText
                   key
+                }
+              }
+            }
+            ... on ComponentChoiceContent {
+              selectedComponent {
+                id
+                type
+                content {
+                  ...on SingleLineContent {
+                    text
+                  }
+                  ...on RichTextContent {
+                    plainText
+                  }
                 }
               }
             }

@@ -5,4 +5,5 @@ export const componentType = {
   richText: <Icon.RichText />,
   paragraphCollection: <Icon.ParagraphCollection />,
   contentChunk: <Icon.Chunk />,
+  componentChoice: <Icon.Choice />,
 };

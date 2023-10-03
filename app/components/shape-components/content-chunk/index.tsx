@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { componentType } from "../helpers";
 import { CopyButton } from "~/components/copy-button";
 import TextareaAutosize from "react-textarea-autosize";

@@ -3,17 +3,13 @@ import { CopyButton } from "~/components/copy-button";
 import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 import TextareaAutosize from "react-textarea-autosize";
 
-const RichText = ({
+const ComponentChoice = ({
   data,
   item,
   setEditedTranslation,
   isOnVariant
 }: {
-  data: {
-    id: string;
-    type: string;
-    translation: string;
-  };
+  data: any;
   item: {
     id: string;
     language: string;
@@ -33,8 +29,9 @@ const RichText = ({
           id: item.id,
           language: item.language,
           componentId: data.id,
-          content: data?.translation,
-          type: isOnVariant ? "variantRichText" : "richText",
+          content: data?.selectedComponent,
+          type: isOnVariant ? "variantComponentChoice" : "componentChoice",
+          sku: item?.sku,
           productId: item?.productId,
         }),
       });
@@ -43,13 +40,15 @@ const RichText = ({
     }
   };
 
-  const onChange = (e: any) => {
+  const selectedComponent = data?.selectedComponent;
+
+  const handleChange = (e: any) => {
     setEditedTranslation((prev: any) => {
       return prev.map((i: any) =>
         i.id === data.id ? { ...i, translation: e.target.value } : i
       );
     });
-  };
+  }
 
   const onVariantChange = (e: any) => {
     setEditedTranslation((prev: any) => {
@@ -58,7 +57,7 @@ const RichText = ({
         if (i?.id === item?.id) {
           newItem.components = newItem.components.map((component: any) => {
             if (component?.id === data?.id) {
-              component.translation = e.target.value;
+              component.selectedComponent.translation = e.target.value;
             }
             return component;
           });
@@ -66,13 +65,13 @@ const RichText = ({
         return newItem;
       });
     });
-  };
+  }
 
   return (
     <div className=" items-start">
       <div className="flex  items-center gap-2 justify-between pr-4 pb-2">
         <div className="flex capitalize font-medium text-sm items-center gap-2">
-          {componentType["richText"]}
+          {componentType["componentChoice"]}
           {data?.id}
         </div>
         <div className="flex flex-row gap-2 w-full justify-end mt-2 ">
@@ -84,17 +83,33 @@ const RichText = ({
         </div>
       </div>
       <form className="w-full relative">
-        <TextareaAutosize
-          value={data?.translation}
-          className="bg-white px-6 pr-8 py-4 min-h-[140px] rounded-md shadow text-base w-full focus:outline-purple-200"
-          onChange={isOnVariant ? onVariantChange: onChange}
-        />
-        <div className="absolute right-4 top-3 ">
-          <CopyButton text={data?.translation} />
+        <div>
+          {selectedComponent?.type === "singleLine" && (
+            <input
+              className="w-full border border-gray-300 rounded-md p-2"
+              value={selectedComponent?.translation}
+              onChange={isOnVariant ? onVariantChange : handleChange}
+            />
+          )}
+          <div className="absolute right-4 top-3 ">
+            <CopyButton text={selectedComponent?.translation} />
+          </div>
         </div>
+        {selectedComponent?.type === "richText" && (
+          <div>
+            <TextareaAutosize
+              className="w-full rounded-md p-2"
+              value={selectedComponent?.translation}
+              onChange={isOnVariant ? onVariantChange : handleChange}
+            />
+            <div className="absolute right-4 top-3 ">
+              <CopyButton text={selectedComponent?.translation} />
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );
 };
 
-export default RichText;
+export default ComponentChoice;

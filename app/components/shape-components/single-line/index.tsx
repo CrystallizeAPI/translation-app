@@ -1,11 +1,12 @@
 import { CopyButton } from "~/components/copy-button";
 import { componentType } from "../helpers";
-import { useState } from "react";
 import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
+
 const SingleLine = ({
   data,
   item,
   setEditedTranslation,
+  isOnVariant,
 }: {
   data: {
     id: string;
@@ -15,8 +16,11 @@ const SingleLine = ({
   item: {
     id: string;
     language: string;
+    sku?: string;
+    productId?: string;
   };
   setEditedTranslation: any;
+  isOnVariant?: boolean;
 }) => {
   const handleClick = async (e: any) => {
     e.preventDefault();
@@ -29,7 +33,9 @@ const SingleLine = ({
           language: item.language,
           componentId: data.id,
           content: data?.translation,
-          type: "singleLine",
+          type: isOnVariant ? "variantSingleLine" : "singleLine",
+          sku: item?.sku,
+          productId: item?.productId,
         }),
       });
     } catch (error) {
@@ -42,6 +48,23 @@ const SingleLine = ({
       return prev.map((i: any) =>
         i.id === data.id ? { ...i, translation: e.target.value } : i
       );
+    });
+  };
+
+  const onVariantChange = (e: any) => {
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) => {
+        const newItem = { ...i };
+        if (i?.id === item?.id) {
+          newItem.components = newItem.components.map((component: any) => {
+            if (component?.id === data?.id) {
+              component.translation = e.target.value;
+            }
+            return component;
+          });
+        }
+        return newItem;
+      });
     });
   };
 
@@ -66,7 +89,7 @@ const SingleLine = ({
         <input
           value={data?.translation}
           className="bg-white px-6 py-4 rounded-md shadow text-base font-medium w-full focus:outline-purple-200"
-          onChange={(e) => onChange(e)}
+          onChange={(e) => (isOnVariant ? onVariantChange(e) : onChange(e))}
         />
         <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
           <CopyButton text={data?.translation} />
