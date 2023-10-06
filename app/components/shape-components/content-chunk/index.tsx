@@ -37,7 +37,7 @@ const ContentChunk = ({
       return prev.map((i: any) => (i.id === data.id ? newParagraphData : i));
     });
   }
-  
+
   return (
     <form>
       <div className="mb-3 flex flex-col w-full bg-s-purple-100 pl-4 rounded-md">
@@ -72,12 +72,14 @@ const ContentChunk = ({
                   {chunk?.type === "richText" && (
                     <div className="w-full relative bg-[#fff]">
                       <TextareaAutosize
-                        value={chunk?.content?.plainText}
+                        value={chunk?.translation}
                         className="bg-white px-6 py-4 text-base w-full min-h-[140px] focus:outline-purple-200 pr-8"
-                        onChange={(e) => {}}
+                        onChange={(e) => {
+                          onChange(e, index, "");
+                        }}
                       />
                       <div className="absolute right-4 top-3 ">
-                        <CopyButton text={chunk?.content?.plainText} />
+                        <CopyButton text={chunk?.translation} />
                       </div>
                     </div>
                   )}
