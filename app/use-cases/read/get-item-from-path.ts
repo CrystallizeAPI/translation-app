@@ -66,6 +66,21 @@ export async function getItemFromPath(path: string, language: string) {
                   ...on RichTextContent {
                     plainText
                   }
+                  ...on ParagraphCollectionContent {
+                    paragraphs {
+                      title {
+                        text
+                      }
+                      body {
+                        plainText
+                      }
+                      images {
+                        url
+                        altText
+                        key
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -80,6 +95,21 @@ export async function getItemFromPath(path: string, language: string) {
                     ... on RichTextContent {
                       plainText
                     }
+                    ...on ParagraphCollectionContent {
+                      paragraphs {
+                        title {
+                          text
+                        }
+                        body {
+                          plainText
+                        }
+                        images {
+                          url
+                          altText
+                          key
+                        }
+                      }
+                    }
                     ... on ImageContent {
                         images {
                             url
@@ -93,7 +123,7 @@ export async function getItemFromPath(path: string, language: string) {
           }
         `,
         {
-            path: path || "/shop/sofas/arbour-eco",
+            path: path,
             version: "draft",
             language: language || "en",
         }

@@ -7,15 +7,16 @@ const ParagraphCollection = ({
   data,
   item,
   setEditedTranslation,
+  isOnVariant,
 }: {
   data: any;
-  item: { id: string; language: string };
-  setEditedTranslation: any;
+  item: { id: string; language: string; sku?: string; productId?: string };
+  setEditedTranslation: React.Dispatch<React.SetStateAction<any[]>>;
+  isOnVariant?: boolean;
 }) => {
   const handleClick = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-
     try {
       data.paragraphs.map(async (paragraph: any) => {
         const body = {
@@ -23,19 +24,22 @@ const ParagraphCollection = ({
           language: item.language,
           componentId: data.id,
           content: {
-            title: { text: paragraph.title || ""},
-            body: { html: paragraph.body || ""},
-            images: paragraph.images.map((image: any) => {
+            title: { text: paragraph.title || "" },
+            body: { html: paragraph.body || "" },
+            images: paragraph?.images?.map((image: any) => {
               return { key: image.key };
             }) || [],
           },
-          type: "paragraphCollection",
+          type: isOnVariant ? "variantParagraphCollection" : "paragraphCollection",
+          sku: item.sku,
+          productId: item.productId,
         };
 
         await fetch("/api/update", {
           method: "POST",
           body: JSON.stringify(body),
         });
+        
       });
     } catch (error) {
       console.log(error);
@@ -47,6 +51,23 @@ const ParagraphCollection = ({
     newParagraphData.paragraphs[index][type] = e.target.value;
     setEditedTranslation((prev: any) => {
       return prev.map((i: any) => (i.id === data.id ? newParagraphData : i));
+    });
+  };
+
+  const onVariantChange = (e: any, index: number, type: string) => {
+    setEditedTranslation((prev: any) => {
+      return prev.map((i: any) => {
+        const newItem = { ...i };
+        if (i?.id === item?.id) {
+          newItem.components = newItem.components.map((component: any) => {
+            if (component?.id === data?.id) {
+              component.paragraphs[index][type] = e.target.value;
+            }
+            return component;
+          });
+        }
+        return newItem;
+      });
     });
   };
 
@@ -76,7 +97,11 @@ const ParagraphCollection = ({
                     value={el?.title}
                     placeholder="Paragraph Collection title"
                     className="w-full text-lg font-medium px-6 pt-6 pb-2 placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-purple-200"
-                    onChange={(e) => onChange(e, innerIndex, "title")}
+                    onChange={(e) =>
+                      isOnVariant
+                        ? onVariantChange(e, innerIndex, "title")
+                        : onChange(e, innerIndex, "title")
+                    }
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
                     <CopyButton text={el?.title} variant="default" />
@@ -87,7 +112,11 @@ const ParagraphCollection = ({
                     value={el?.body}
                     placeholder="Paragraph collection body"
                     className="bg-white pl-6 py-2 pr-12 min-h-[140px]  text-base w-full focus:outline-purple-200"
-                    onChange={(e) => onChange(e, innerIndex, "body")}
+                    onChange={(e) =>
+                      isOnVariant
+                        ? onVariantChange(e, innerIndex, "body")
+                        : onChange(e, innerIndex, "body")
+                    }
                   />
                   <div className="absolute right-4 top-3 ">
                     <CopyButton text={el?.body} variant="default" />

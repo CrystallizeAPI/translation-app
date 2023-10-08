@@ -1,7 +1,7 @@
 import { apiClient } from "../shared";
 
 export async function updateParagraphCollection(itemId: string, language: string, componentId: string, content: any) {
-    try {
+ try {
         const data = await apiClient.pimApi(
             `#graphql
                 mutation(
@@ -32,7 +32,7 @@ export async function updateParagraphCollection(itemId: string, language: string
         }
         )
         return data.item.updateComponent;
-    } catch (e) {
-        console.log(e)
+    } catch (error) {
+        console.error(error)
     }
 }

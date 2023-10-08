@@ -14,7 +14,7 @@ export const singleLineTranslation = async (component: any, language: string, to
     {
       id: component.id,
       type: "singleLine",
-      translation: await translation.text() || "",
+      translation: await translation.text(),
     }
   )
 
@@ -79,46 +79,17 @@ export const contentChunkTranslation = async (component: any, language: string, 
           break;
         case "paragraphCollection":
           const paragraphTranslation = await paragraphCollectionTranslation(item, language, toLanguage);
-          const paragraphComp = {
-            id: item.id,
-            type: "paragraphCollection",
-            translation: await paragraphTranslation,
-          };
-          data.chunks.push(paragraphComp);
+          data.chunks.push(paragraphTranslation);
           break;
         default:
           break;
       }
     })
   })
-  // for (const chunk of component?.content?.chunks || []) {
-  //   for (const item of chunk || []) {
-  //     switch (item.type) {
-  //       case "singleLine":
-  //         const translation = item?.content?.text && await fetchTranslation(item.content.text, language, toLanguage);
-  //         const comp = {
-  //           id: item.id,
-  //           type: "singleLine",
-  //           translation: await translation.text(),
-  //         };
-  //         data.chunks.push(comp);
-  //         break;
-  //       case "richText" && item.content:
-  //         const richTranslation = await fetchTranslation(item.content.plainText.toString(), language, toLanguage);
-  //         const richComp = {
-  //           id: item.id,
-  //           type: "richText",
-  //           translation: await richTranslation.text(),
-  //         };
-  //         data.chunks.push(richComp);
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // }
+  
   data.chunks = await Promise.all(data.chunks);
   console.log("data", data);
+
   return data;
 };
 

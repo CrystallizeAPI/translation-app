@@ -1,6 +1,6 @@
 import { apiClient } from "../shared";
 
-export async function updateVariantRichText(itemId: string, sku: string, language: string, componentId: string, content: string) {
+export async function updateVariantParagraph(itemId: string, sku: string, language: string, componentId: string, content: any) {
   try {
     const data = await apiClient.pimApi(
       `#graphql
@@ -9,14 +9,17 @@ export async function updateVariantRichText(itemId: string, sku: string, languag
             $sku: String!
             $language: String!
             $componentId: String!
-            $text: String!
+            $content: [ParagraphContentInput!]!
           ) {
             product {
               updateVariantComponent(
                 productId: $productId
                 sku: $sku
                 language: $language
-                input: { componentId: $componentId, richText: { html: [$text] } }
+                input: {
+                  componentId: $componentId
+                  paragraphCollection: { paragraphs: $content }
+                }
               ) {
                 id
               }
@@ -27,9 +30,10 @@ export async function updateVariantRichText(itemId: string, sku: string, languag
       sku,
       language,
       componentId,
-      text: content
+      content
     }
     )
+    console.log(data);
     return data.product.updateVariantComponent;
   } catch (error) {
     console.error(error);

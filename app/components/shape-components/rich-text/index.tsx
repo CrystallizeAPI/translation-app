@@ -20,7 +20,7 @@ const RichText = ({
     sku?: string;
     productId?: string;
   };
-  setEditedTranslation: any;
+  setEditedTranslation: React.Dispatch<React.SetStateAction<any[]>>;
   isOnVariant?: boolean;
 }) => {
   const handleClick = async (e: any) => {
@@ -35,7 +35,8 @@ const RichText = ({
           componentId: data.id,
           content: data?.translation,
           type: isOnVariant ? "variantRichText" : "richText",
-          productId: item?.productId,
+          sku: item.sku,
+          productId: item.productId,
         }),
       });
     } catch (error) {

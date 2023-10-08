@@ -1,8 +1,9 @@
 import { apiClient } from "../shared";
 
 export async function updateRichTextComponent(itemId: string, language: string, componentId: string, content: string) {
+  try {
     const data = await apiClient.pimApi(
-        `#graphql
+      `#graphql
             mutation(
                 $itemId: ID!
                 $language: String!
@@ -20,11 +21,14 @@ export async function updateRichTextComponent(itemId: string, language: string, 
                 }
             }
         `, {
-        itemId,
-        language,
-        componentId,
-        content
-      }
+      itemId,
+      language,
+      componentId,
+      content
+    }
     )
     return data.item.updateComponent;
+  } catch (error) {
+    console.error(error);
+  }
 }

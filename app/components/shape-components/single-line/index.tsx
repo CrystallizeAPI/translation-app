@@ -19,7 +19,7 @@ const SingleLine = ({
     sku?: string;
     productId?: string;
   };
-  setEditedTranslation: any;
+  setEditedTranslation: React.Dispatch<React.SetStateAction<any[]>>;
   isOnVariant?: boolean;
 }) => {
   const handleClick = async (e: any) => {
@@ -34,8 +34,8 @@ const SingleLine = ({
           componentId: data.id,
           content: data?.translation,
           type: isOnVariant ? "variantSingleLine" : "singleLine",
-          sku: item?.sku,
-          productId: item?.productId,
+          sku: item.sku,
+          productId: item.productId,
         }),
       });
     } catch (error) {

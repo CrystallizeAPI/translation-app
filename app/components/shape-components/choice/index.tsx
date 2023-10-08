@@ -16,7 +16,7 @@ const ComponentChoice = ({
     sku?: string;
     productId?: string;
   };
-  setEditedTranslation: any;
+  setEditedTranslation: React.Dispatch<React.SetStateAction<any[]>>;
   isOnVariant?: boolean;
 }) => {
   const handleClick = async (e: any) => {
