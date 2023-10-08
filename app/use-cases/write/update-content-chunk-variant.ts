@@ -81,7 +81,6 @@ export async function updateVariantChunk(itemId: string, sku: string, language: 
       content: itemsToUpdate
     }
     )
-    console.log(data);
     return data.product.updateVariantComponent;
   } catch (error) {
     console.error(error);

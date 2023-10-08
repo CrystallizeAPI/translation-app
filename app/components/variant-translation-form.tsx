@@ -73,6 +73,18 @@ export const VariantTranslationForm = ({
     });
   };
 
+  const publishVariant = async (item: any) => {
+    await fetch(`/api/update/publish-variant`, {
+      method: "POST",
+      body: JSON.stringify({
+        productId,
+        language: toLanguage,
+        sku: item.sku,
+        data: item.components,
+      }),
+    });
+  };
+
   return (
     <div className="my-10 py-3 pt-5 px-3 rounded-md">
       <h2 className="font-semibold text-xl mb-4">Variant Translations</h2>
@@ -144,6 +156,18 @@ export const VariantTranslationForm = ({
                 )}
               </div>
             ))}
+            {item.components?.some(
+              (component: any) => component?.translation
+            ) && (
+              <Button
+                intent="action"
+                onClick={() => publishVariant(item)}
+                className="mt-4"
+                disabled={loading || !toLanguage}
+              >
+                Publish variant to draft
+              </Button>
+            )}
             {loading && <Loader />}
           </div>
         ))}
