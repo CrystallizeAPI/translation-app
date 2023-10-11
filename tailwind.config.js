@@ -2,6 +2,11 @@
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    extend: {
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
+    },
     colors: {
       cyan: {
         50: "#eefdfc",

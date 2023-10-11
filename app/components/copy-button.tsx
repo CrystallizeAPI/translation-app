@@ -17,8 +17,8 @@ export const CopyButton = ({
   };
   return (
     <Tooltip content="Copy to clipboard">
-      <IconButton variant={variant} onClick={handleCopy}>
-        <Icon.Copy />
+      <IconButton className="!w-7 !h-7" variant={variant} onClick={handleCopy}>
+        <Icon.Copy width="20" height="20" />
       </IconButton>
     </Tooltip>
   );

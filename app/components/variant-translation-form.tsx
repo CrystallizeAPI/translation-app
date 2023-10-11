@@ -67,12 +67,7 @@ export const VariantTranslationForm = ({
   };
 
   return (
-    <div className="my-10 bg-[#fff] py-3 pt-5 px-5 rounded-md">
-      <h2 className="font-semibold text-xl mb-4">Variant Translations</h2>
-      <h3>
-        This item also has components on variants. Would you like to translate
-        those?
-      </h3>
+    <div className="my-10 py-3 pt-5 rounded-md">
       <Button
         intent="action"
         onClick={handleTranslate}
@@ -89,12 +84,12 @@ export const VariantTranslationForm = ({
       )}
       <div className="my-8">
         {items?.map((item: any) => (
-          <div className="my-3 border-1 border-cyan-200">
+          <div className="my-3 border-1 border-cyan-200" key={item.sku}>
             <p className="text-sm  bg-pink-100 p-3 text-gray-600">
               {item.name} <span className="text-xs">({item.sku})</span>
             </p>
-            {item.components?.map((component: any) => (
-              <div className="px-3 bg-pink-100">
+            {item.components?.map((component: any, i) => (
+              <div className="px-3 bg-pink-100" key={`${component.type}-${i}`}>
                 {component.type === "singleLine" && component?.translation && (
                   <SingleLine
                     data={component}
