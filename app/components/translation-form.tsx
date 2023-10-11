@@ -3,44 +3,26 @@ import { translateArray } from "~/use-cases/fetch-translation";
 import { Button, Icon } from "@crystallize/design-system";
 import { getComponentByType } from "~/use-cases/get-component-type";
 import { Loader } from "./loader";
-import {
-  SingleLine,
-  RichText,
-  ParagraphCollection,
-  ContentChunk,
-  ComponentChoice,
-} from "./shape-components";
 import Dropdown from "./dropdown";
-import { VariantTranslationForm } from "./variant-translation-form";
-
+// import { VariantTranslationForm } from "./variant-translation-form";
+import ComponentFactory from "./shape-components/componentFactory";
 export default function TranslationForm({
   availableLanguages,
   language,
   item,
+  stories,
 }: {
   availableLanguages: { code: string; name: string }[];
   language: string;
   item: any;
 }) {
-  const [fromLanguage, setFromLanguage] = useState(language);
-  const [toLanguage, setToLanguage] = useState("");
+  const [storiesState, setStoriesState] = useState(stories);
+  const [translateLanguage, setLanguage] = useState({
+    from: language,
+    to: "",
+  });
+  const [finished, setFinished] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [singleLineTranslations, setSingleLineTranslations] = useState<any[]>(
-    []
-  );
-  const [richTextTranslations, setRichTextTranslations] = useState<any[]>([]);
-  const [paragraphCollectionTranslations, setParagraphCollectionTranslations] =
-    useState<any[]>([]);
-  const [contentChunkTranslations, setContentChunkTranslations] = useState<
-    any[]
-  >([]);
-  const [componentChoiceTranslations, setComponentChoiceTranslations] =
-    useState<any[]>([]);
-
-  const itemData = {
-    id: item?.id,
-    language: toLanguage,
-  };
 
   const components: any = {
     singleLine: getComponentByType("singleLine", item),
@@ -50,42 +32,36 @@ export default function TranslationForm({
     componentChoice: getComponentByType("componentChoice", item),
   };
 
+  const onTranslationCompleted = (translation) => {
+    console.log(translation?.id, "in compelted", { translation });
+
+    setStoriesState((prevState) => {
+      return {
+        ...prevState,
+        product: {
+          ...prevState.product,
+          [translation.id]: {
+            ...prevState.product[translation.id],
+            translation: translation.translation,
+          },
+        },
+      };
+    });
+  };
+
   const handleTranslate = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setLoading(true);
-
     const translationPromises = [];
 
     for (const type in components) {
       const translationPromise = translateArray(
         components[type],
-        language,
-        toLanguage,
-        type
+        translateLanguage,
+        type,
+        onTranslationCompleted
       );
-
-      translationPromise.then((translations) => {
-        switch (type) {
-          case "singleLine":
-            setSingleLineTranslations(translations);
-            break;
-          case "richText":
-            setRichTextTranslations(translations);
-            break;
-          case "paragraphCollection":
-            setParagraphCollectionTranslations(translations);
-            break;
-          case "contentChunk":
-            setContentChunkTranslations(translations);
-            break;
-          case "componentChoice":
-            setComponentChoiceTranslations(translations);
-            break;
-          default:
-            break;
-        }
-      });
 
       translationPromises.push(translationPromise);
     }
@@ -93,13 +69,7 @@ export default function TranslationForm({
     await Promise.all(translationPromises);
 
     setLoading(false);
-  };
-
-  const handleLanguageChange = (
-    code: string,
-    field: "fromLanguage" | "toLanguage"
-  ) => {
-    field === "fromLanguage" ? setFromLanguage(code) : setToLanguage(code);
+    setFinished(true);
   };
 
   const handlePublishAll = async (e: React.FormEvent) => {
@@ -109,27 +79,29 @@ export default function TranslationForm({
       method: "POST",
       body: JSON.stringify({
         data: [
-          ...singleLineTranslations,
-          ...richTextTranslations,
-          ...paragraphCollectionTranslations,
-          ...contentChunkTranslations,
+          // ...singleLineTranslations,
+          // ...richTextTranslations,
+          // ...paragraphCollectionTranslations,
+          // ...contentChunkTranslations,
         ],
-        language: toLanguage,
+        language: translateLanguage.to,
         itemId: item.id,
       }),
     });
   };
-
+  console.log({ storiesState });
   return (
     <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
       <div className="py-8 flex flex-row gap-2 items-center pb-8 w-full border-solid border-0 border-b border-gray-200">
-        <h1 className="py-2 font-normal text-xl">Translate</h1>
         <div>
           <Dropdown
             options={availableLanguages}
-            selectedOption={fromLanguage}
+            selectedOption={translateLanguage.from}
             onSelectOption={(code) =>
-              handleLanguageChange(code, "fromLanguage")
+              setLanguage({
+                ...translateLanguage,
+                from: code,
+              })
             }
             buttonText="Select language"
           />
@@ -138,22 +110,56 @@ export default function TranslationForm({
         <div className="flex items-center gap-4">
           <Dropdown
             options={availableLanguages}
-            selectedOption={toLanguage}
-            onSelectOption={(code) => handleLanguageChange(code, "toLanguage")}
+            selectedOption={translateLanguage.to}
             buttonText="Select language"
+            onSelectOption={(code) =>
+              setLanguage({
+                ...translateLanguage,
+                to: code,
+              })
+            }
           />
         </div>
-        <Button
-          intent="action"
-          onClick={handleTranslate}
-          prepend={<Icon.Language width={20} height={20} />}
-          disabled={!!toLanguage ? false : true}
-        >
-          Translate
-        </Button>
       </div>
-      <div className="mt-8">
-        {singleLineTranslations &&
+      <details
+        className="py-6 border-b border-0 border-solid border-gray-200"
+        open
+      >
+        <summary className="justify-between flex items-center">
+          <div className="font-medium">
+            {finished && <div>Ferdig</div>}
+            Product story
+          </div>
+          <div>
+            <Button
+              variant="elevate"
+              onClick={handlePublishAll}
+              prepend={<Icon.Rocket width="22" height="22" />}
+              // disabled={
+              //   singleLineTranslations.length === 0 &&
+              //   richTextTranslations.length === 0 &&
+              //   paragraphCollectionTranslations.length === 0 &&
+              //   contentChunkTranslations.length === 0
+              // }
+            >
+              Add all translations to draft
+            </Button>
+            <Button
+              intent="action"
+              onClick={handleTranslate}
+              prepend={<Icon.Language width={20} height={20} />}
+              disabled={!!translateLanguage.to ? false : true}
+            >
+              Translate
+            </Button>
+          </div>
+        </summary>
+        {Object.keys(storiesState.product).map((key) => {
+          const current = storiesState.product[key];
+          return <ComponentFactory cmp={current} key={key} loading={loading} />;
+        })}
+
+        {/* {singleLineTranslations &&
           singleLineTranslations.map((i: any) => (
             <SingleLine
               key={i.id}
@@ -197,29 +203,18 @@ export default function TranslationForm({
               item={itemData}
               setEditedTranslation={setComponentChoiceTranslations}
             />
-          ))}
-      </div>
-      {loading && <Loader />}
-      <Button
-        intent="action"
-        onClick={handlePublishAll}
-        disabled={
-          singleLineTranslations.length === 0 &&
-          richTextTranslations.length === 0 &&
-          paragraphCollectionTranslations.length === 0 &&
-          contentChunkTranslations.length === 0
-        }
-      >
-        Add all translations to draft
-      </Button>
-      {item?.variants?.length > 0 && (
+          ))} */}
+        {/* {loading && <Loader />} */}
+      </details>
+
+      {/* {item?.variants?.length > 0 && (
         <VariantTranslationForm
           data={item?.variants}
           language={fromLanguage}
           toLanguage={toLanguage}
           productId={item.id}
         />
-      )}
+      )} */}
     </div>
   );
 }

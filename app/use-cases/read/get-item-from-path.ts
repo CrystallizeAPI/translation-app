@@ -1,8 +1,8 @@
 import { apiClient } from "../shared";
 
 export async function getItemFromPath(path: string, language: string) {
-    const data = await apiClient.catalogueApi(
-        `#graphql
+  const data = await apiClient.catalogueApi(
+    `#graphql
           query ($path: String!, $version: VersionLabel, $language: String!) {
             catalogue(path: $path, language: $language, version:$version) {
               id
@@ -66,21 +66,21 @@ export async function getItemFromPath(path: string, language: string) {
                   ...on RichTextContent {
                     plainText
                   }
-                  ...on ParagraphCollectionContent {
-                    paragraphs {
-                      title {
-                        text
-                      }
-                      body {
-                        plainText
-                      }
-                      images {
-                        url
-                        altText
-                        key
+                  ... on ParagraphCollectionContent {
+                      paragraphs {
+                        title {
+                          text
+                        }
+                        body {
+                          plainText
+                        }
+                        images {
+                          url
+                          altText
+                          key
+                        }
                       }
                     }
-                  }
                 }
               }
             }
@@ -95,7 +95,7 @@ export async function getItemFromPath(path: string, language: string) {
                     ... on RichTextContent {
                       plainText
                     }
-                    ...on ParagraphCollectionContent {
+                    ... on ParagraphCollectionContent {
                       paragraphs {
                         title {
                           text
@@ -122,12 +122,30 @@ export async function getItemFromPath(path: string, language: string) {
              }
           }
         `,
-        {
-            path: path,
-            version: "draft",
-            language: language || "en",
-        }
-    );
+    {
+      path: path || "/superb-product",
+      version: "draft",
+      language: language || "en",
+    }
+  );
+  let stories = {
+    product: {},
+    variants: [],
+  };
+  data.catalogue.components.map((a) => {
+    stories.product[a.id] = { ...a, translation: null };
+  });
 
-    return { ...data };
+  // for (const cmp in stories.product) {
+  //   if (structuralComponent.includes(stories.product[cmp].type)) {
+  //     stories.product[cmp].content?.chunks?.map((a, i) => {
+  //       stories.product[cmp].content.chunks[`${cmp}-${i}`] = {
+  //         ...a,
+  //         translation: null,
+  //       };
+  //     });
+  //   }
+  // }
+
+  return { ...data, stories };
 }

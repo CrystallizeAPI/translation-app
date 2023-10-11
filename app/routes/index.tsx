@@ -11,22 +11,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const data = await getItemFromPath(itemPath!, itemLanguageCode!);
   const availableLanguages = await getAvailableLanguages();
-
   return json({
     item: data.catalogue,
     language: itemLanguageCode,
     availableLanguages,
+    stories: data.stories,
   });
 };
 
 export default function Index() {
-  const { item, language, availableLanguages } = useLoaderData();
+  const { item, language, availableLanguages, stories } = useLoaderData();
   return (
     <div className="bg-gray-50">
       <TranslationForm
         language={language}
         availableLanguages={availableLanguages}
         item={item}
+        stories={stories}
       />
     </div>
   );
