@@ -53,7 +53,7 @@ export const paragraphCollectionTranslation = async (
   let data = {
     id: component.id,
     type: "paragraphCollection",
-    paragraphs: component?.content?.paragraphs.map(async (paragraph: any) => {
+    translation: component?.content?.paragraphs.map(async (paragraph: any) => {
       const title =
         paragraph?.title &&
         (await fetchTranslation(
@@ -66,6 +66,7 @@ export const paragraphCollectionTranslation = async (
           paragraph.body.plainText.toString(),
           translateLanguage
         ));
+
       return {
         title: await title?.text(),
         body: await body?.text(),
@@ -73,7 +74,7 @@ export const paragraphCollectionTranslation = async (
       };
     }),
   };
-  data.paragraphs = await Promise.all(data.paragraphs);
+  data.translation = await Promise.all(data.translation);
   console.log({ data });
   return data;
 };
@@ -166,43 +167,18 @@ export const choiceComponentTranslation = async (
   return data;
 };
 
-export const translateArray = async (
-  components: any[],
+export const getComponentTranslation = async (
   translateLanguage: Language,
-  type: string,
-  onTranslationCompleted: () => void
+  component: any
 ) => {
-  const translations = await Promise.all(
-    components.map(async (component) => {
-      switch (type) {
-        case "singleLine":
-          return await singleLineTranslation(component, translateLanguage).then(
-            (translation) => onTranslationCompleted(translation)
-          );
-        case "richText":
-          return await richTextTranslation(component, translateLanguage).then(
-            (translation) => onTranslationCompleted(translation)
-          );
-        case "paragraphCollection":
-          return await paragraphCollectionTranslation(
-            component,
-            translateLanguage
-          ).then((translation) =>
-            onTranslationCompleted({
-              id: translation?.id,
-              type: translation?.type,
-              translation: translation.paragraphs,
-            })
-          );
-        case "contentChunk":
-          return await contentChunkTranslation(component, translateLanguage);
-        case "componentChoice":
-          return await choiceComponentTranslation(component, translateLanguage);
-        default:
-          return await singleLineTranslation(component, translateLanguage);
-      }
-    })
-  );
-
-  return translations;
+  switch (component.type) {
+    case "singleLine":
+      return await singleLineTranslation(component, translateLanguage);
+    case "richText":
+      return await richTextTranslation(component, translateLanguage);
+    case "paragraphCollection":
+      return await paragraphCollectionTranslation(component, translateLanguage);
+    default:
+      return null;
+  }
 };

@@ -128,62 +128,6 @@ export async function getItemFromPath(path: string, language: string) {
       language: language || "en",
     }
   );
-  let product = {};
-  let variants = {};
 
-  data.catalogue.components.map((a) => {
-    product[a.id] = { ...a, translation: null };
-    if (a.type === "contentChunk") {
-      product[a.id].content = {};
-      a.content.chunks?.map((c, i) => {
-        product[a.id].content[`${a.id}-#${i}`] = {};
-        c.map((chunkCmp) => {
-          product[a.id].content[`${a.id}-#${i}`][chunkCmp.id] = {
-            ...chunkCmp,
-            translation: null,
-          };
-        });
-      });
-    }
-  });
-
-  data.catalogue.variants.map((variant) => {
-    variants[variant.sku] = {};
-    variant.components.map((cmp) => {
-      variants[variant.sku][cmp.id] = { content: cmp, translation: null };
-
-      if (cmp.type === "contentChunk") {
-        cmp.content.chunks?.map((chunk, i) => {
-          variants[variant.sku][cmp.id][`${chunk.id}-#${i}`] = {};
-          chunk.map((c) => {
-            variants[variant.sku][cmp.id][`${chunk.id}-#${i}`][chunk.id] = {
-              ...c,
-              translation: null,
-            };
-          });
-        });
-      }
-    });
-  });
-  console.log({ variants });
-  console.log({ product });
-
-  return { ...data, stories: { product, variants } };
+  return data;
 }
-
-const storiesDummy = {
-  product: {
-    "cmp-1": {},
-    "cmp-2": {},
-    chunk: {
-      "chunk-1": {
-        title: {},
-        description: {},
-      },
-      "chunk-2": {
-        title: {},
-        description: {},
-      },
-    },
-  },
-};

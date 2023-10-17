@@ -1,75 +1,106 @@
-import React, { useState } from "react";
-import { translateArray } from "~/use-cases/fetch-translation";
+import React, { useCallback, useState } from "react";
+import { getComponentTranslation } from "~/use-cases/fetch-translation";
 import { Button, Icon } from "@crystallize/design-system";
-import { getComponentByType } from "~/use-cases/get-component-type";
-import { Loader } from "./loader";
 import Dropdown from "./dropdown";
-import { VariantTranslationForm } from "./variant-translation-form";
 import ComponentFactory from "./shape-components/componentFactory";
-export default function TranslationForm({
-  availableLanguages,
-  language,
-  item,
-  stories,
-}: {
-  availableLanguages: { code: string; name: string }[];
+
+type TranslationFormProps = {
   language: string;
-  item: any;
-}) {
-  const [storiesState, setStoriesState] = useState(stories);
-  const [translateLanguage, setLanguage] = useState({
-    from: language,
-    to: "",
-  });
-  const [finished, setFinished] = useState(false);
-  const [loading, setLoading] = useState(false);
+  components: any[];
+  availableLanguages: { code: string; name: string }[];
+};
+type UpdateComponent = {
+  componentIndex: number;
+  chunkIndex?: number;
+  chunkComponentIndex?: number;
+  translation?: any;
+  isTranslating?: boolean;
+};
 
-  const components: any = {
-    singleLine: getComponentByType("singleLine", item),
-    richText: getComponentByType("richText", item),
-    paragraphCollection: getComponentByType("paragraphCollection", item),
-    contentChunk: getComponentByType("contentChunk", item),
-    componentChoice: getComponentByType("componentChoice", item),
-  };
+export default function TranslationForm({
+  language,
+  components,
+  availableLanguages,
+}: TranslationFormProps) {
+  const [translateLanguage, setLanguage] = useState({ from: language, to: "" });
+  const [componentsWithTranslation, setComponentsWithTranslation] =
+    useState(components);
 
-  const onTranslationCompleted = (translation) => {
-    console.log(translation?.id, "in compelted", { translation });
+  const updateComponent = useCallback(
+    ({
+      componentIndex,
+      chunkIndex,
+      chunkComponentIndex,
+      translation,
+      isTranslating = false,
+    }: UpdateComponent) => {
+      setComponentsWithTranslation((prev) => {
+        const copy = [...prev];
+        if (
+          typeof chunkIndex === "number" &&
+          typeof chunkComponentIndex === "number"
+        ) {
+          copy[componentIndex].content.chunks[chunkIndex][
+            chunkComponentIndex
+          ].isTranslating = isTranslating;
+          copy[componentIndex].content.chunks[chunkIndex][
+            chunkComponentIndex
+          ].translation = translation;
+        } else {
+          copy[componentIndex].isTranslating = isTranslating;
+          copy[componentIndex].translation = translation;
+        }
 
-    setStoriesState((prevState) => {
-      return {
-        ...prevState,
-        product: {
-          ...prevState.product,
-          [translation.id]: {
-            ...prevState.product[translation.id],
-            translation: translation.translation,
-          },
-        },
-      };
-    });
-  };
+        return copy;
+      });
+    },
+    []
+  );
 
   const handleTranslate = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setLoading(true);
-    const translationPromises = [];
 
-    for (const type in components) {
-      const translationPromise = translateArray(
-        components[type],
-        translateLanguage,
-        type,
-        onTranslationCompleted
-      );
-
-      translationPromises.push(translationPromise);
-    }
-
-    await Promise.all(translationPromises);
-
-    setLoading(false);
-    setFinished(true);
+    components.forEach(async (component, componentIndex) => {
+      if (component.type === "contentChunk") {
+        component?.content?.chunks.forEach(
+          async (chunkComponents, chunkIndex) => {
+            chunkComponents.forEach(
+              async (chunkComponent, chunkComponentIndex) => {
+                updateComponent({
+                  componentIndex,
+                  chunkIndex,
+                  chunkComponentIndex,
+                  isTranslating: true,
+                });
+                const data = await getComponentTranslation(
+                  translateLanguage,
+                  chunkComponent
+                );
+                updateComponent({
+                  componentIndex,
+                  chunkIndex,
+                  chunkComponentIndex,
+                  isTranslating: false,
+                  translation: data.translation,
+                });
+              }
+            );
+          }
+        );
+      } else {
+        updateComponent({ componentIndex, isTranslating: true });
+        const data = await getComponentTranslation(
+          translateLanguage,
+          component
+        );
+        updateComponent({
+          componentIndex,
+          isTranslating: false,
+          translation: data?.translation,
+        });
+      }
+    });
   };
 
   const handlePublishAll = async (e: React.FormEvent) => {
@@ -89,6 +120,7 @@ export default function TranslationForm({
       }),
     });
   };
+
   return (
     <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
       <div className="py-8 flex flex-row gap-2 items-center pb-8 w-full border-solid border-0 border-b border-gray-200">
@@ -125,10 +157,7 @@ export default function TranslationForm({
         open
       >
         <summary className="justify-between flex items-center">
-          <div className="font-medium">
-            {finished && <div>Ferdig</div>}
-            Product story
-          </div>
+          <div className="font-medium">Product story</div>
           <div>
             <Button
               variant="elevate"
@@ -147,15 +176,14 @@ export default function TranslationForm({
               intent="action"
               onClick={handleTranslate}
               prepend={<Icon.Language width={20} height={20} />}
-              disabled={!!translateLanguage.to ? false : true}
+              disabled={translateLanguage.to ? false : true}
             >
               Translate
             </Button>
           </div>
         </summary>
-        {Object.keys(storiesState.product).map((key) => {
-          const current = storiesState.product[key];
-          return <ComponentFactory cmp={current} key={key} loading={loading} />;
+        {componentsWithTranslation.map((component) => {
+          return <ComponentFactory key={component.id} component={component} />;
         })}
 
         {/* {singleLineTranslations &&
