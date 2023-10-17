@@ -10,32 +10,11 @@ import { componentType } from "../helpers";
 import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 
 export default function ComponentFactory({ cmp, loading }) {
-  const handleClick = async (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    try {
-      await fetch("/api/update", {
-        method: "POST",
-        body: JSON.stringify({
-          id: item.id,
-          language: item.language,
-          componentId: data.id,
-          content: data?.translation,
-          type: isOnVariant ? "variantSingleLine" : "singleLine",
-          sku: item?.sku,
-          productId: item?.productId,
-        }),
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const componentTypes = {
     singleLine: <SingleLine key={cmp.id} data={cmp} />,
     richText: <RichText key={cmp.id} data={cmp} />,
     paragraphCollection: <ParagraphCollection key={cmp.id} data={cmp} />,
-    contentChunk: <ContentChunk key={cmp.id} data={cmp} />,
+    // contentChunk: <ContentChunk key={cmp.id} data={cmp} />,
     // componentChoice: (
     //   <ComponentChoice
     //     key={cmp.id}
@@ -51,6 +30,10 @@ export default function ComponentFactory({ cmp, loading }) {
     const { type } = cmp;
     const structuralCmpTypes = ["contentChunk", "componentChoice"];
     const isStructuralComponent = structuralCmpTypes.includes(type);
+
+    if (isStructuralComponent) {
+      return componentTypes[type];
+    }
     return (
       <div
         className={`${
@@ -76,7 +59,7 @@ export default function ComponentFactory({ cmp, loading }) {
               <div className="flex flex-row gap-2 w-full justify-end">
                 <CopyButton text={cmp?.translation ?? ""} />
                 <Tooltip content="Add this translation to draft">
-                  <IconButton className="!w-7 !h-7" onClick={handleClick}>
+                  <IconButton className="!w-7 !h-7">
                     <Icon.Rocket width="20" height="20" />
                   </IconButton>
                 </Tooltip>

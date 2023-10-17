@@ -128,24 +128,62 @@ export async function getItemFromPath(path: string, language: string) {
       language: language || "en",
     }
   );
-  let stories = {
-    product: {},
-    variants: [],
-  };
+  let product = {};
+  let variants = {};
+
   data.catalogue.components.map((a) => {
-    stories.product[a.id] = { ...a, translation: null };
+    product[a.id] = { ...a, translation: null };
+    if (a.type === "contentChunk") {
+      product[a.id].content = {};
+      a.content.chunks?.map((c, i) => {
+        product[a.id].content[`${a.id}-#${i}`] = {};
+        c.map((chunkCmp) => {
+          product[a.id].content[`${a.id}-#${i}`][chunkCmp.id] = {
+            ...chunkCmp,
+            translation: null,
+          };
+        });
+      });
+    }
   });
 
-  // for (const cmp in stories.product) {
-  //   if (structuralComponent.includes(stories.product[cmp].type)) {
-  //     stories.product[cmp].content?.chunks?.map((a, i) => {
-  //       stories.product[cmp].content.chunks[`${cmp}-${i}`] = {
-  //         ...a,
-  //         translation: null,
-  //       };
-  //     });
-  //   }
-  // }
+  data.catalogue.variants.map((variant) => {
+    variants[variant.sku] = {};
+    variant.components.map((cmp) => {
+      variants[variant.sku][cmp.id] = { content: cmp, translation: null };
 
-  return { ...data, stories };
+      if (cmp.type === "contentChunk") {
+        cmp.content.chunks?.map((chunk, i) => {
+          variants[variant.sku][cmp.id][`${chunk.id}-#${i}`] = {};
+          chunk.map((c) => {
+            variants[variant.sku][cmp.id][`${chunk.id}-#${i}`][chunk.id] = {
+              ...c,
+              translation: null,
+            };
+          });
+        });
+      }
+    });
+  });
+  console.log({ variants });
+  console.log({ product });
+
+  return { ...data, stories: { product, variants } };
 }
+
+const storiesDummy = {
+  product: {
+    "cmp-1": {},
+    "cmp-2": {},
+    chunk: {
+      "chunk-1": {
+        title: {},
+        description: {},
+      },
+      "chunk-2": {
+        title: {},
+        description: {},
+      },
+    },
+  },
+};

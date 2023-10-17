@@ -4,7 +4,7 @@ import { Button, Icon } from "@crystallize/design-system";
 import { getComponentByType } from "~/use-cases/get-component-type";
 import { Loader } from "./loader";
 import Dropdown from "./dropdown";
-// import { VariantTranslationForm } from "./variant-translation-form";
+import { VariantTranslationForm } from "./variant-translation-form";
 import ComponentFactory from "./shape-components/componentFactory";
 export default function TranslationForm({
   availableLanguages,
@@ -89,7 +89,6 @@ export default function TranslationForm({
       }),
     });
   };
-  console.log({ storiesState });
   return (
     <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
       <div className="py-8 flex flex-row gap-2 items-center pb-8 w-full border-solid border-0 border-b border-gray-200">
