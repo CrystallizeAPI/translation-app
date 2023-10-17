@@ -1,20 +1,13 @@
-import React, { useCallback, useState } from "react";
-import { getComponentTranslation } from "~/use-cases/fetch-translation";
 import { Button, Icon } from "@crystallize/design-system";
 import Dropdown from "./dropdown";
 import ComponentFactory from "./shape-components/componentFactory";
+import type { Component, ContentChunkContent } from "~/__generated__/types";
+import { useTranslations } from "~/use-cases/use-translations";
 
 type TranslationFormProps = {
   language: string;
-  components: any[];
+  components: Component[];
   availableLanguages: { code: string; name: string }[];
-};
-type UpdateComponent = {
-  componentIndex: number;
-  chunkIndex?: number;
-  chunkComponentIndex?: number;
-  translation?: any;
-  isTranslating?: boolean;
 };
 
 export default function TranslationForm({
@@ -22,86 +15,12 @@ export default function TranslationForm({
   components,
   availableLanguages,
 }: TranslationFormProps) {
-  const [translateLanguage, setLanguage] = useState({ from: language, to: "" });
-  const [componentsWithTranslation, setComponentsWithTranslation] =
-    useState(components);
-
-  const updateComponent = useCallback(
-    ({
-      componentIndex,
-      chunkIndex,
-      chunkComponentIndex,
-      translation,
-      isTranslating = false,
-    }: UpdateComponent) => {
-      setComponentsWithTranslation((prev) => {
-        const copy = [...prev];
-        if (
-          typeof chunkIndex === "number" &&
-          typeof chunkComponentIndex === "number"
-        ) {
-          copy[componentIndex].content.chunks[chunkIndex][
-            chunkComponentIndex
-          ].isTranslating = isTranslating;
-          copy[componentIndex].content.chunks[chunkIndex][
-            chunkComponentIndex
-          ].translation = translation;
-        } else {
-          copy[componentIndex].isTranslating = isTranslating;
-          copy[componentIndex].translation = translation;
-        }
-
-        return copy;
-      });
-    },
-    []
-  );
-
-  const handleTranslate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    components.forEach(async (component, componentIndex) => {
-      if (component.type === "contentChunk") {
-        component?.content?.chunks.forEach(
-          async (chunkComponents, chunkIndex) => {
-            chunkComponents.forEach(
-              async (chunkComponent, chunkComponentIndex) => {
-                updateComponent({
-                  componentIndex,
-                  chunkIndex,
-                  chunkComponentIndex,
-                  isTranslating: true,
-                });
-                const data = await getComponentTranslation(
-                  translateLanguage,
-                  chunkComponent
-                );
-                updateComponent({
-                  componentIndex,
-                  chunkIndex,
-                  chunkComponentIndex,
-                  isTranslating: false,
-                  translation: data.translation,
-                });
-              }
-            );
-          }
-        );
-      } else {
-        updateComponent({ componentIndex, isTranslating: true });
-        const data = await getComponentTranslation(
-          translateLanguage,
-          component
-        );
-        updateComponent({
-          componentIndex,
-          isTranslating: false,
-          translation: data?.translation,
-        });
-      }
-    });
-  };
+  const {
+    componentsWithTranslation,
+    handleTranslate,
+    translateLanguage,
+    onChangeLanguage,
+  } = useTranslations({ language, components });
 
   const handlePublishAll = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,10 +48,7 @@ export default function TranslationForm({
             options={availableLanguages}
             selectedOption={translateLanguage.from}
             onSelectOption={(code) =>
-              setLanguage({
-                ...translateLanguage,
-                from: code,
-              })
+              onChangeLanguage({ ...translateLanguage, from: code })
             }
             buttonText="Select language"
           />
@@ -144,10 +60,7 @@ export default function TranslationForm({
             selectedOption={translateLanguage.to}
             buttonText="Select language"
             onSelectOption={(code) =>
-              setLanguage({
-                ...translateLanguage,
-                to: code,
-              })
+              onChangeLanguage({ ...translateLanguage, to: code })
             }
           />
         </div>
@@ -183,7 +96,31 @@ export default function TranslationForm({
           </div>
         </summary>
         {componentsWithTranslation.map((component) => {
-          return <ComponentFactory key={component.id} component={component} />;
+          if (component.type !== "contentChunk") {
+            return (
+              <ComponentFactory key={component.id} component={component} />
+            );
+          }
+
+          return (
+            <div key={component.id} className="space-y-4">
+              {(component.content as ContentChunkContent)?.chunks.map(
+                (chunk, index) => {
+                  console.log(chunk);
+                  return (
+                    <div key={index} className="bg-purple-200 p-4 rounded">
+                      {chunk.map((chunkComponent) => (
+                        <ComponentFactory
+                          key={chunkComponent.id}
+                          component={chunkComponent}
+                        />
+                      ))}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          );
         })}
 
         {/* {singleLineTranslations &&

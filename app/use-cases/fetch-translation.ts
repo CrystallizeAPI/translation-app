@@ -50,33 +50,31 @@ export const paragraphCollectionTranslation = async (
   component: any,
   translateLanguage: Language
 ) => {
-  let data = {
+  return {
     id: component.id,
     type: "paragraphCollection",
-    translation: component?.content?.paragraphs.map(async (paragraph: any) => {
-      const title =
-        paragraph?.title &&
-        (await fetchTranslation(
-          paragraph?.title?.text ?? "",
-          translateLanguage
-        ));
-      const body =
-        paragraph?.body &&
-        (await fetchTranslation(
-          paragraph.body.plainText.toString(),
-          translateLanguage
-        ));
+    translation: await Promise.all(
+      component?.content?.paragraphs.map(async (paragraph: any) => {
+        const [title, body] = await Promise.all([
+          paragraph?.title
+            ? fetchTranslation(paragraph?.title?.text ?? "", translateLanguage)
+            : undefined,
+          paragraph?.body
+            ? fetchTranslation(
+                paragraph.body.plainText.toString(),
+                translateLanguage
+              )
+            : undefined,
+        ]);
 
-      return {
-        title: await title?.text(),
-        body: await body?.text(),
-        images: paragraph?.images,
-      };
-    }),
+        return {
+          title: await title?.text(),
+          body: await body?.text(),
+          images: paragraph?.images,
+        };
+      })
+    ),
   };
-  data.translation = await Promise.all(data.translation);
-  console.log({ data });
-  return data;
 };
 
 export const contentChunkTranslation = async (

@@ -1,8 +1,8 @@
 import { apiClient } from "../shared";
 
 export async function getAvailableLanguages() {
-    const data = await apiClient.pimApi(
-        `#graphql
+  const data = await apiClient.pimApi(
+    `#graphql
             query ($identifier: String!) {
                 tenant {
                     get(identifier: $identifier) {
@@ -13,9 +13,10 @@ export async function getAvailableLanguages() {
                     }
                 }
             }
-        `, {
-            identifier: process.env.CRYSTALLIZE_TENANT_IDENTIFIER
-        }
-    )
+        `,
+    {
+      identifier: process.env.CRYSTALLIZE_TENANT_IDENTIFIER,
+    }
+  );
   return data.tenant.get.availableLanguages;
 }
