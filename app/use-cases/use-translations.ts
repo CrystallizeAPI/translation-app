@@ -1,6 +1,10 @@
 import { useCallback, useState } from "react";
 import { getComponentTranslation } from "~/use-cases/fetch-translation";
-import type { Component, ContentChunkContent } from "~/__generated__/types";
+import type {
+  Component,
+  ComponentChoiceContent,
+  ContentChunkContent,
+} from "~/__generated__/types";
 
 type UpdateComponent = {
   componentIndex: number;
@@ -8,6 +12,7 @@ type UpdateComponent = {
   chunkComponentIndex?: number;
   translation?: any;
   isTranslating?: boolean;
+  isChoice?: boolean;
 };
 
 type Translation = string | { title?: string; body?: string }[];
@@ -39,13 +44,17 @@ export const useTranslations = ({
       chunkIndex,
       chunkComponentIndex,
       translation,
+      isChoice = false,
       isTranslating = false,
     }: UpdateComponent) => {
       setComponentsWithTranslation((prev) => {
         const copy = [...prev];
         let component = copy[componentIndex];
 
-        if (
+        if (isChoice) {
+          component = (copy[componentIndex].content as ComponentChoiceContent)
+            .selectedComponent;
+        } else if (
           typeof chunkIndex === "number" &&
           typeof chunkComponentIndex === "number"
         ) {
@@ -64,64 +73,114 @@ export const useTranslations = ({
     []
   );
 
+  const handleChunkTranslation = useCallback(
+    (component: Component, componentIndex: number) => {
+      (component?.content as ContentChunkContent)?.chunks.forEach(
+        async (chunkComponents, chunkIndex) => {
+          chunkComponents.forEach(
+            async (chunkComponent, chunkComponentIndex) => {
+              const base = {
+                componentIndex,
+                chunkIndex,
+                chunkComponentIndex,
+              };
+
+              try {
+                updateComponent({ ...base, isTranslating: true });
+                const data = await getComponentTranslation(
+                  translateLanguage,
+                  chunkComponent
+                );
+                updateComponent({
+                  ...base,
+                  isTranslating: false,
+                  translation: data?.translation,
+                });
+              } catch {
+                updateComponent({ ...base, isTranslating: false });
+                // TODO: show error message
+              }
+            }
+          );
+        }
+      );
+    },
+    [translateLanguage, updateComponent]
+  );
+
+  const handleChoiceTranslation = useCallback(
+    async (component: Component, componentIndex: number) => {
+      try {
+        updateComponent({
+          componentIndex,
+          isTranslating: true,
+          isChoice: true,
+        });
+        const data = await getComponentTranslation(
+          translateLanguage,
+          component
+        );
+        updateComponent({
+          componentIndex,
+          isTranslating: false,
+          translation: data?.translation,
+          isChoice: true,
+        });
+      } catch {
+        updateComponent({ componentIndex, isTranslating: false });
+        // TODO: show error message
+      }
+    },
+    [translateLanguage, updateComponent]
+  );
+
+  const handleBaseComponentTranslation = useCallback(
+    async (component: Component, componentIndex: number) => {
+      try {
+        updateComponent({ componentIndex, isTranslating: true });
+        const data = await getComponentTranslation(
+          translateLanguage,
+          component
+        );
+        updateComponent({
+          componentIndex,
+          isTranslating: false,
+          translation: data?.translation,
+        });
+      } catch {
+        updateComponent({ componentIndex, isTranslating: false });
+        // TODO: show error message
+      }
+    },
+    [translateLanguage, updateComponent]
+  );
+
   const handleTranslate = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      components.forEach(async (component, componentIndex) => {
-        if (component.type !== "contentChunk") {
-          try {
-            updateComponent({ componentIndex, isTranslating: true });
-            const data = await getComponentTranslation(
-              translateLanguage,
-              component
-            );
-            updateComponent({
-              componentIndex,
-              isTranslating: false,
-              translation: data?.translation,
-            });
-          } catch {
-            updateComponent({ componentIndex, isTranslating: false });
-            // TODO: show error message
-          }
-
-          return;
+      components.forEach((component, componentIndex) => {
+        if (component.type === "contentChunk") {
+          return handleChunkTranslation(component, componentIndex);
         }
 
-        (component?.content as ContentChunkContent)?.chunks.forEach(
-          async (chunkComponents, chunkIndex) => {
-            chunkComponents.forEach(
-              async (chunkComponent, chunkComponentIndex) => {
-                const base = {
-                  componentIndex,
-                  chunkIndex,
-                  chunkComponentIndex,
-                };
+        if (component.type === "componentChoice") {
+          return handleChoiceTranslation(
+            (component.content as ComponentChoiceContent).selectedComponent,
+            componentIndex
+          );
+        }
 
-                try {
-                  updateComponent({ ...base, isTranslating: true });
-                  const data = await getComponentTranslation(
-                    translateLanguage,
-                    chunkComponent
-                  );
-                  updateComponent({
-                    ...base,
-                    isTranslating: false,
-                    translation: data?.translation,
-                  });
-                } catch {
-                  updateComponent({ ...base, isTranslating: false });
-                  // TODO: show error message
-                }
-              }
-            );
-          }
-        );
+        return handleBaseComponentTranslation(component, componentIndex);
       });
     },
-    [components, updateComponent, translateLanguage]
+    [
+      components,
+      handleChoiceTranslation,
+      handleChunkTranslation,
+      handleBaseComponentTranslation,
+    ]
   );
 
   const onChangeLanguage = useCallback(
