@@ -1,7 +1,11 @@
 import { Button, Icon } from "@crystallize/design-system";
 import Dropdown from "./dropdown";
 import ComponentFactory from "./shape-components/componentFactory";
-import type { Component, ContentChunkContent } from "~/__generated__/types";
+import type {
+  Component,
+  ContentChunkContent,
+  ComponentChoiceContent,
+} from "~/__generated__/types";
 import { useTranslations } from "~/use-cases/use-translations";
 
 type TranslationFormProps = {
@@ -96,31 +100,40 @@ export default function TranslationForm({
           </div>
         </summary>
         {componentsWithTranslation.map((component) => {
-          if (component.type !== "contentChunk") {
+          if (component.type === "contentChunk") {
             return (
-              <ComponentFactory key={component.id} component={component} />
+              <div key={component.id} className="space-y-4">
+                {(component.content as ContentChunkContent)?.chunks.map(
+                  (chunk, index) => {
+                    return (
+                      <div key={index} className="bg-purple-200 p-4 rounded">
+                        {chunk.map((chunkComponent) => (
+                          <ComponentFactory
+                            key={chunkComponent.id}
+                            component={chunkComponent}
+                          />
+                        ))}
+                      </div>
+                    );
+                  }
+                )}
+              </div>
             );
           }
 
-          return (
-            <div key={component.id} className="space-y-4">
-              {(component.content as ContentChunkContent)?.chunks.map(
-                (chunk, index) => {
-                  console.log(chunk);
-                  return (
-                    <div key={index} className="bg-purple-200 p-4 rounded">
-                      {chunk.map((chunkComponent) => (
-                        <ComponentFactory
-                          key={chunkComponent.id}
-                          component={chunkComponent}
-                        />
-                      ))}
-                    </div>
-                  );
+          if (component.type === "componentChoice") {
+            return (
+              <ComponentFactory
+                key={component.id}
+                component={
+                  (component.content as ComponentChoiceContent)
+                    .selectedComponent
                 }
-              )}
-            </div>
-          );
+              />
+            );
+          }
+
+          return <ComponentFactory key={component.id} component={component} />;
         })}
 
         {/* {singleLineTranslations &&
