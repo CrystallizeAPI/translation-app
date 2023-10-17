@@ -21,6 +21,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export default function Index() {
   const { item, language, availableLanguages, stories } = useLoaderData();
+  console.log({ stories });
   return (
     <div className="bg-gray-50">
       <TranslationForm
