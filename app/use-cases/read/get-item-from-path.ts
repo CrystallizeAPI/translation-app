@@ -1,9 +1,10 @@
 import { apiClient } from "../shared";
+import type { Query } from "~/__generated__/types";
 
 export async function getItemFromPath(path: string, language: string) {
   const data = await apiClient.catalogueApi(
     `#graphql
-          query ($path: String!, $version: VersionLabel, $language: String!) {
+          query GET_COMPONENTS($path: String!, $version: VersionLabel, $language: String!) {
             catalogue(path: $path, language: $language, version:$version) {
               id
               name
@@ -129,5 +130,5 @@ export async function getItemFromPath(path: string, language: string) {
     }
   );
 
-  return data;
+  return data as Pick<Query, "catalogue">;
 }

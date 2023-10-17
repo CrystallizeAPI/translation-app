@@ -1,10 +1,10 @@
-import { json, type LoaderFunction } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getItemFromPath } from "~/use-cases/read/get-item-from-path";
 import { getAvailableLanguages } from "~/use-cases/read/get-available-languages";
 import TranslationForm from "~/components/translation-form";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const itemPath = url.searchParams.get("item");
   const itemLanguageCode = url.searchParams.get("language") ?? "en";
@@ -20,7 +20,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Index() {
-  const { item, language, availableLanguages } = useLoaderData();
+  const { item, language, availableLanguages } = useLoaderData<typeof loader>();
+
+  if (!item || !item.components) {
+    return <div>Something when wrong getting your item.</div>;
+  }
 
   return (
     <div className="bg-gray-50">
