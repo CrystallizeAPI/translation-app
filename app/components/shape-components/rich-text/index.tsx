@@ -1,19 +1,20 @@
-import { componentType } from "../helpers";
-import { CopyButton } from "~/components/copy-button";
-import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 import TextareaAutosize from "react-textarea-autosize";
 
 const RichText = ({
   data,
   item,
+  isStructuralComponent,
   setEditedTranslation,
   isOnVariant,
+  structuralColor,
 }: {
   data: {
     id: string;
     type: string;
     translation: string;
   };
+  isStructuralComponent?: boolean;
+  structuralColor?: string;
   item: {
     id: string;
     language: string;
@@ -51,20 +52,16 @@ const RichText = ({
   };
 
   return (
-    <form className="w-full gap-2 relative">
-      <TextareaAutosize
-        value={
-          data?.translation ?? data?.content?.plainText?.map((a) => a) ?? ""
-        }
-        disabled={!hasTranslation}
-        className={`!bg-[#fff] px-6 py-4 min-h-[140px] rounded-md  w-full focus:outline-purple-200 ${
-          !hasTranslation
-            ? "text-base font-normal text-gray-400 italic shadow"
-            : "text-base font-medium "
-        }`}
-        onChange={isOnVariant ? onVariantChange : onChange}
-      />
-    </form>
+    <TextareaAutosize
+      value={data?.translation ?? data?.content?.plainText?.map((a) => a) ?? ""}
+      className={`${
+        !hasTranslation
+          ? "text-base font-normal text-gray-400 italic "
+          : "text-base font-normal "
+      } !bg-[#fff] w-full px-6  py-3  min-h-[140px]`}
+      disabled={!hasTranslation}
+      onChange={isOnVariant ? onVariantChange : onChange}
+    />
   );
 };
 

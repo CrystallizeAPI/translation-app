@@ -7,10 +7,14 @@ const ParagraphCollection = ({
   data,
   item,
   setEditedTranslation,
+  isStructuralComponent,
+  structuralColor,
 }: {
   data: any;
   item: { id: string; language: string };
   setEditedTranslation: any;
+  isStructuralComponent?: boolean;
+  structuralColor?: string;
 }) => {
   // const handleClick = async (e: any) => {
   //   e.preventDefault();
@@ -54,7 +58,7 @@ const ParagraphCollection = ({
   const hasTranslation = data.translation?.length > 0;
 
   return (
-    <form>
+    <form className="flex flex-col gap-4">
       {/* <div className="mb-3 flex flex-col gap-2 w-full">
         <div className="flex  items-center gap-2 justify-between pr-4">
           <div className="flex capitalize font-medium text-sm gap-2 ">
@@ -70,21 +74,19 @@ const ParagraphCollection = ({
         <div className="mt-2"> */}
       {paragraphs?.map((el: any, innerIndex: number) => {
         return (
-          <div
-            key={innerIndex}
-            className="w-full bg-[#fff] rounded-md shadow overflow-hidden mb-4 "
-          >
+          <div key={innerIndex}>
             <div className="relative flex justify-between items-center">
               <input
                 value={hasTranslation ? el?.title : el?.title?.text}
                 placeholder="Paragraph Collection title"
-                className={`!bg-[#fff] py-4 w-full focus:outline-purple-200 text-lg font-medium px-6 pt-6 pb-2 placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-purple-200
+                className={`!bg-[#fff] w-full pt-3  text-lg font-medium px-6  placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-none
                 ${
                   !hasTranslation
                     ? "text-base font-normal text-gray-400 italic"
                     : "text-base font-medium"
                 }`}
                 onChange={(e) => onChange(e, innerIndex, "title")}
+                readOnly
               />
 
               {hasTranslation && (
@@ -99,12 +101,13 @@ const ParagraphCollection = ({
                   hasTranslation ? el?.body : el.body?.plainText?.map((a) => a)
                 }
                 placeholder="Paragraph collection body"
-                className={`!bg-[#fff] px-6 py-4 min-h-[140px] rounded-md  w-full focus:outline-purple-200 ${
+                className={`!bg-[#fff] px-6 py-4 min-h-[140px]  w-full focus:outline-none ${
                   !hasTranslation
                     ? "text-base font-normal text-gray-400 italic "
                     : "text-base font-normal  "
                 }`}
                 onChange={(e) => onChange(e, innerIndex, "body")}
+                readOnly
               />
               {hasTranslation && (
                 <div className="absolute right-4 top-3 ">
@@ -112,17 +115,18 @@ const ParagraphCollection = ({
                 </div>
               )}
             </div>
-            <div className="px-6 py-6">
-              {el?.images &&
-                el?.images?.map((image: any, index: number) => (
+            {el?.images && (
+              <div className="px-6 py-6 flex gap-2">
+                {el?.images?.map((image: any, index: number) => (
                   <div
-                    className="w-32 rounded overflow-hidden shadow"
+                    className="w-32 rounded overflow-hidden p-2 bg-[#fff] shadow"
                     key={index}
                   >
                     <img src={image?.url} className="w-full " />
                   </div>
                 ))}
-            </div>
+              </div>
+            )}
           </div>
         );
       })}

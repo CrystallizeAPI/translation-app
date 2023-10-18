@@ -1,45 +1,84 @@
-import {
-  SingleLine,
-  RichText,
-  ParagraphCollection,
-  ContentChunk,
-  ComponentChoice,
-} from "../index";
+import { SingleLine, RichText, ParagraphCollection } from "../index";
 import { CopyButton } from "~/components/copy-button";
 import { componentType } from "../helpers";
 import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 
-export default function ComponentFactory({ component }) {
+export default function ComponentFactory({
+  component,
+  isStructuralComponent,
+  structuralColor,
+}: {
+  isStructuralComponent?: boolean;
+  structuralColor?: string;
+  component: {
+    id: string;
+    type: string;
+    translation?: string;
+    content?: string;
+  };
+}) {
   const componentTypes = {
-    singleLine: <SingleLine key={component.id} data={component} />,
-    richText: <RichText key={component.id} data={component} />,
-    paragraphCollection: (
-      <ParagraphCollection key={component.id} data={component} />
+    singleLine: (
+      <SingleLine
+        key={component.id}
+        data={component}
+        isStructuralComponent={isStructuralComponent}
+        structuralColor={structuralColor}
+      />
     ),
-    // contentChunk: <ContentChunk key={cmp.id} data={cmp} />,
-    // componentChoice: (
-    //   <ComponentChoice
-    //     key={cmp.id}
-    //     // data={i}
-    //     // item={itemData}
-    //     // setEditedTranslation={setSingleLineTranslations}
-    //   />
-    // ),
+    richText: (
+      <RichText
+        key={component.id}
+        data={component}
+        isStructuralComponent={isStructuralComponent}
+        structuralColor={structuralColor}
+      />
+    ),
+    paragraphCollection: (
+      <ParagraphCollection
+        key={component.id}
+        data={component}
+        isStructuralComponent={isStructuralComponent}
+        structuralColor={structuralColor}
+      />
+    ),
   };
 
   const { type, isTranslating, translation } = component;
-  const structuralCmpTypes = ["contentChunk", "componentChoice"];
-  const isStructuralComponent = structuralCmpTypes.includes(type);
-
   if (isStructuralComponent) {
-    return componentTypes[type];
+    return (
+      <div className="bg-[#fff] border-b border-solid border-purple-100">
+        <div className="flex pl-6 pt-2 items-end gap-2 justify-between">
+          <div className="flex capitalize h-7 items-center font-medium text-sm gap-2">
+            {translation && (
+              <div className="bg-s-green-600 rounded-full justify-center w-4 h-4 text-[10px] font-medium flex items-center text-[#fff]">
+                ✓
+              </div>
+            )}
+            <span className={`${structuralColor} italic font-normal text-xs`}>
+              {component?.id}
+            </span>
+            {isTranslating && !translation && (
+              <div className="border-gray-200 h-4 w-4 animate-spin-slow rounded-full border-[3px] border-t-s-green-600" />
+            )}
+          </div>
+          <div>
+            {translation && (
+              <div className="flex flex-row gap-2 w-full justify-end">
+                <CopyButton text={translation ?? ""} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {componentTypes[type]}
+      </div>
+    );
   }
   return (
-    <div
-      className={`${isStructuralComponent ? "bg-purple-100 rounded-t-md" : ""}`}
-    >
-      <div className="flex pl-2 pt-2 items-end gap-2 justify-between mt-4">
-        <div className="flex capitalize h-7 items-center   font-medium text-sm gap-2">
+    <div>
+      <div className="flex pl-2 pt-2 items-end gap-2 justify-between">
+        <div className="flex capitalize h-7 pb-2 items-center   font-medium text-sm gap-2">
           {translation ? (
             <div className="bg-s-green-600 rounded-full justify-center w-4 h-4 text-[10px] font-medium flex items-center text-[#fff]">
               ✓
@@ -56,17 +95,14 @@ export default function ComponentFactory({ component }) {
           {translation && (
             <div className="flex flex-row gap-2 w-full justify-end">
               <CopyButton text={translation ?? ""} />
-              <Tooltip content="Add this translation to draft">
-                <IconButton className="!w-7 !h-7">
-                  <Icon.Rocket width="20" height="20" />
-                </IconButton>
-              </Tooltip>
             </div>
           )}
         </div>
       </div>
 
-      <div className="pt-2">{componentTypes[type]}</div>
+      <div className="shadow bg-[#fff] overflow-hidden rounded-md ">
+        {componentTypes[type]}
+      </div>
     </div>
   );
 }
