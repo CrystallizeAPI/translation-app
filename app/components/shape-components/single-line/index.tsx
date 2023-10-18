@@ -4,7 +4,11 @@ const SingleLine = ({
   data,
   setEditedTranslation,
   isOnVariant,
+  isStructuralComponent,
+  structuralColor,
 }: {
+  isStructuralComponent?: boolean;
+  structuralColor?: string;
   data: {
     id: string;
     type: string;
@@ -43,15 +47,11 @@ const SingleLine = ({
   };
 
   return (
-    <form className="gap-2 relative">
+    <form>
       <input
+        className="px-6 py-4 !bg-[#fff] w-full"
         value={data?.translation ?? data?.content?.text ?? ""}
         disabled={!hasTranslation}
-        className={`!bg-[#fff] px-6 py-4 rounded-md  shadow w-full focus:outline-purple-200 ${
-          !hasTranslation
-            ? "text-base font-normal text-gray-400 italic "
-            : "text-base font-medium"
-        }`}
         onChange={(e) => (isOnVariant ? onVariantChange(e) : onChange(e))}
       />
     </form>
