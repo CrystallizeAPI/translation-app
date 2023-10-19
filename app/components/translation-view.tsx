@@ -26,7 +26,7 @@ export function TranslationView({
   } = useTranslations({ language, components });
 
   return (
-    <>
+    <div className="pt-4">
       <TranslationToolbar
         availableLanguages={availableLanguages}
         translateLanguage={translateLanguage}
@@ -38,6 +38,6 @@ export function TranslationView({
         totalProcessingTranslationsCount={totalProcessingTranslationsCount}
       />
       <TranslationForm components={componentsWithTranslation} />
-    </>
+    </div>
   );
 }

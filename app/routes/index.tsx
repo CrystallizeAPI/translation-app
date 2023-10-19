@@ -23,7 +23,7 @@ export default function Index() {
   const { item, language, availableLanguages } = useLoaderData<typeof loader>();
 
   if (!item || !item.components) {
-    return <div>Something when wrong getting your item.</div>;
+    return <div>Something went wrong getting your item.</div>;
   }
 
   return (

@@ -1,7 +1,7 @@
 import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 export const CopyButton = ({
   text,
-  variant = "elevate",
+  variant = "default",
 }: {
   text: string;
   variant?: "elevate" | "default";

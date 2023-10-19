@@ -1,3 +1,5 @@
+import { Preferences } from "./types";
+
 type Language = {
   from: string;
   to: string;
@@ -5,25 +7,31 @@ type Language = {
 
 export const fetchTranslation = async (
   text: string,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   const { from, to } = translateLanguage;
   return await fetch("/api/translate/v2", {
     method: "POST",
     body: JSON.stringify({
       role: "user",
-      content: `Translate the text delimited by triple quotes from ${from} to ${to}. The returned translation should contain no quotes.\n\n\"\"\"${text}\"\"\"`,
+      content: `Translate the text delimited by triple quotes from ${from} to ${to}. ${preferences.customPromptFromUser}. The returned translation should contain no quotes.\n\n\"\"\"${text}\"\"\"`,
     }),
   });
 };
 
 export const singleLineTranslation = async (
   component: any,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   const translation =
     component?.content?.text &&
-    (await fetchTranslation(component.content.text, translateLanguage));
+    (await fetchTranslation(
+      component.content.text,
+      translateLanguage,
+      preferences
+    ));
   return {
     id: component.id,
     type: "singleLine",
@@ -33,11 +41,13 @@ export const singleLineTranslation = async (
 
 export const richTextTranslation = async (
   component: any,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   const translation = await fetchTranslation(
     component?.content?.plainText.toString(),
-    translateLanguage
+    translateLanguage,
+    preferences
   );
   return {
     id: component.id,
@@ -48,7 +58,8 @@ export const richTextTranslation = async (
 
 export const paragraphCollectionTranslation = async (
   component: any,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   return {
     id: component.id,
@@ -57,12 +68,17 @@ export const paragraphCollectionTranslation = async (
       component?.content?.paragraphs.map(async (paragraph: any) => {
         const [title, body] = await Promise.all([
           paragraph?.title
-            ? fetchTranslation(paragraph?.title?.text ?? "", translateLanguage)
+            ? fetchTranslation(
+                paragraph?.title?.text ?? "",
+                translateLanguage,
+                preferences
+              )
             : undefined,
           paragraph?.body
             ? fetchTranslation(
                 paragraph.body.plainText.toString(),
-                translateLanguage
+                translateLanguage,
+                preferences
               )
             : undefined,
         ]);
@@ -79,7 +95,8 @@ export const paragraphCollectionTranslation = async (
 
 export const contentChunkTranslation = async (
   component: any,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   const data = {
     id: component.id,
@@ -93,7 +110,8 @@ export const contentChunkTranslation = async (
         case "singleLine":
           const translation = await fetchTranslation(
             item.content?.text,
-            translateLanguage
+            translateLanguage,
+            preferences
           );
           const comp = {
             id: item.id,
@@ -105,7 +123,8 @@ export const contentChunkTranslation = async (
         case "richText" && item.content:
           const richTranslation = await fetchTranslation(
             item.content.plainText.toString(),
-            translateLanguage
+            translateLanguage,
+            preferences
           );
           const richComp = {
             id: item.id,
@@ -125,7 +144,8 @@ export const contentChunkTranslation = async (
 
 export const choiceComponentTranslation = async (
   component: any,
-  translateLanguage: Language
+  translateLanguage: Language,
+  preferences: Preferences
 ) => {
   const data = {
     id: component.id,
@@ -137,7 +157,8 @@ export const choiceComponentTranslation = async (
     case "singleLine":
       const translation = await fetchTranslation(
         selectedChoice.content.text,
-        translateLanguage
+        translateLanguage,
+        preferences
       );
       const comp = {
         id: selectedChoice.id,
@@ -149,7 +170,8 @@ export const choiceComponentTranslation = async (
     case "richText":
       const richTranslation = await fetchTranslation(
         selectedChoice.content.plainText.toString(),
-        translateLanguage
+        translateLanguage,
+        preferences
       );
       const richComp = {
         id: selectedChoice.id,
@@ -167,15 +189,28 @@ export const choiceComponentTranslation = async (
 
 export const getComponentTranslation = async (
   translateLanguage: Language,
-  component: any
+  component: any,
+  preferences: Preferences
 ) => {
   switch (component.type) {
     case "singleLine":
-      return await singleLineTranslation(component, translateLanguage);
+      return await singleLineTranslation(
+        component,
+        translateLanguage,
+        preferences
+      );
     case "richText":
-      return await richTextTranslation(component, translateLanguage);
+      return await richTextTranslation(
+        component,
+        translateLanguage,
+        preferences
+      );
     case "paragraphCollection":
-      return await paragraphCollectionTranslation(component, translateLanguage);
+      return await paragraphCollectionTranslation(
+        component,
+        translateLanguage,
+        preferences
+      );
     default:
       return null;
   }
