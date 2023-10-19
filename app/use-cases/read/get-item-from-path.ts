@@ -1,134 +1,30 @@
 import { apiClient } from "../shared";
-import type { Query } from "~/__generated__/types";
+import type { Item, Maybe } from "~/__generated__/types";
+import { Component } from "./fragments";
 
-export async function getItemFromPath(path: string, language: string) {
-  const data = await apiClient.catalogueApi(
+export async function getItemFromPath(id: string, language: string) {
+  const data = await apiClient.pimApi(
     `#graphql
-          query GET_COMPONENTS($path: String!, $version: VersionLabel, $language: String!) {
-            catalogue(path: $path, language: $language, version:$version) {
-              id
-              name
-              path
-              ... on Product {
-                variants {
-                  id
-                  name
-                  sku
-                  components {
-                    id
-                    name
-                    type
-                    content {
-                      ...componentsContent
-                    }
-                  }
-                }
-              }
-              components {
-                id
-                name
-                type
-                content {
-                  ...componentsContent
-                }
-              }
-            }
-          }
-          fragment componentsContent on ComponentContent {
-            ... on SingleLineContent {
-              text
-            }
-            ... on RichTextContent {
-              plainText
-            }
-            ... on ParagraphCollectionContent {
-              paragraphs {
-                title {
-                  text
-                }
-                body {
-                  plainText
-                }
-                images {
-                  url
-                  altText
-                  key
-                }
-              }
-            }
-            ... on ComponentChoiceContent {
-              selectedComponent {
-                id
-                type
-                content {
-                  ...on SingleLineContent {
-                    text
-                  }
-                  ...on RichTextContent {
-                    plainText
-                  }
-                  ... on ParagraphCollectionContent {
-                      paragraphs {
-                        title {
-                          text
-                        }
-                        body {
-                          plainText
-                        }
-                        images {
-                          url
-                          altText
-                          key
-                        }
-                      }
-                    }
-                }
-              }
-            }
-            ... on ContentChunkContent {
-                chunks {
-                  id
-                  type
-                  content {
-                    ... on SingleLineContent {
-                      text
-                    }
-                    ... on RichTextContent {
-                      plainText
-                    }
-                    ... on ParagraphCollectionContent {
-                      paragraphs {
-                        title {
-                          text
-                        }
-                        body {
-                          plainText
-                        }
-                        images {
-                          url
-                          altText
-                          key
-                        }
-                      }
-                    }
-                    ... on ImageContent {
-                        images {
-                            url
-                            altText
-                            key
-                        }
-                    }
-                  }
-                }
-             }
-          }
-        `,
+     query GET_PRODUCT_COMPONENTS($id: ID!, $language: String!, $versionLabel: VersionLabel) {
+      item {
+       get(id: $id, language: $language, versionLabel: $versionLabel) {
+        id
+        language
+        type
+        components {
+          ...Component
+        }
+      }
+    }
+  }
+  ${Component}
+    `,
     {
-      path: path || "/superb-product",
+      id: id || "64dcc8084ae8428a30beb442",
       version: "draft",
       language: language || "en",
     }
   );
 
-  return data as Pick<Query, "catalogue">;
+  return data?.item?.get as Maybe<Item>;
 }

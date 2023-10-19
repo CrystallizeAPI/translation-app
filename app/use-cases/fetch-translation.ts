@@ -1,4 +1,4 @@
-import { Preferences } from "./types";
+import type { Preferences } from "./types";
 
 type Language = {
   from: string;
@@ -52,7 +52,7 @@ export const richTextTranslation = async (
   return {
     id: component.id,
     type: "richText",
-    translation: await translation.text(),
+    translation: [await translation.text()],
   };
 };
 
@@ -91,100 +91,6 @@ export const paragraphCollectionTranslation = async (
       })
     ),
   };
-};
-
-export const contentChunkTranslation = async (
-  component: any,
-  translateLanguage: Language,
-  preferences: Preferences
-) => {
-  const data = {
-    id: component.id,
-    type: "contentChunk",
-    chunks: [] as any[],
-  };
-
-  for (const chunk of component?.content?.chunks || []) {
-    for (const item of chunk || []) {
-      switch (item.type) {
-        case "singleLine":
-          const translation = await fetchTranslation(
-            item.content?.text,
-            translateLanguage,
-            preferences
-          );
-          const comp = {
-            id: item.id,
-            type: "singleLine",
-            translation: await translation?.text(),
-          };
-          data.chunks.push(comp);
-          break;
-        case "richText" && item.content:
-          const richTranslation = await fetchTranslation(
-            item.content.plainText.toString(),
-            translateLanguage,
-            preferences
-          );
-          const richComp = {
-            id: item.id,
-            type: "richText",
-            translation: await richTranslation.text(),
-          };
-          data.chunks.push(richComp);
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
-  return data;
-};
-
-export const choiceComponentTranslation = async (
-  component: any,
-  translateLanguage: Language,
-  preferences: Preferences
-) => {
-  const data = {
-    id: component.id,
-    type: "componentChoice",
-    selectedComponent: {} as any,
-  };
-  const selectedChoice = component?.content?.selectedComponent;
-  switch (selectedChoice?.type) {
-    case "singleLine":
-      const translation = await fetchTranslation(
-        selectedChoice.content.text,
-        translateLanguage,
-        preferences
-      );
-      const comp = {
-        id: selectedChoice.id,
-        type: "singleLine",
-        translation: await translation.text(),
-      };
-      data.selectedComponent = comp;
-      break;
-    case "richText":
-      const richTranslation = await fetchTranslation(
-        selectedChoice.content.plainText.toString(),
-        translateLanguage,
-        preferences
-      );
-      const richComp = {
-        id: selectedChoice.id,
-        type: "richText",
-        translation: await richTranslation.text(),
-      };
-      data.selectedComponent = richComp;
-      break;
-    default:
-      break;
-  }
-  data.selectedComponent = await data.selectedComponent;
-  return data;
 };
 
 export const getComponentTranslation = async (

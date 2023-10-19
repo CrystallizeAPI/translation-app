@@ -9,6 +9,5 @@ export type Preferences = {
 export type Translation = string | { title?: string; body?: string }[];
 
 export type ComponentsWithTranslation = Component & {
-  isTranslating?: boolean;
-  translation?: Translation;
+  translationState?: "translating" | "translated" | "error";
 };

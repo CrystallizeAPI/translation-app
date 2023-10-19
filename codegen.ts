@@ -12,7 +12,7 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: [
     {
-      [`https://api.crystallize.com/${tenantIdentifier}/catalogue`]: {
+      [`https://pim.crystallize.com/graphql`]: {
         headers: {
           "X-Crystallize-Access-Token-Id": tokenId,
           "X-Crystallize-Access-Token-Secret": tokenSecret,
@@ -22,7 +22,6 @@ const config: CodegenConfig = {
   ],
   generates: {
     "./app/__generated__/types.ts": {
-      schema: "./src/client-schema.graphql",
       plugins: ["typescript"],
       config: {
         preResolveTypes: false,

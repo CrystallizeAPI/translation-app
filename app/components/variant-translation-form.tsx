@@ -91,12 +91,7 @@ export const VariantTranslationForm = ({
             {item.components?.map((component: any, i) => (
               <div className="px-3 bg-pink-100" key={`${component.type}-${i}`}>
                 {component.type === "singleLine" && component?.translation && (
-                  <SingleLine
-                    data={component}
-                    item={createItemData(item)}
-                    setEditedTranslation={setItems}
-                    isOnVariant={true}
-                  />
+                  <SingleLine data={component} />
                 )}
                 {component.type === "richText" && component?.translation && (
                   <RichText
