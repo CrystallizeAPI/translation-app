@@ -2,7 +2,7 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getItemFromPath } from "~/use-cases/read/get-item-from-path";
 import { getAvailableLanguages } from "~/use-cases/read/get-available-languages";
-import TranslationForm from "~/components/translation-form";
+import { TranslationView } from "~/components/translation-view";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -28,11 +28,13 @@ export default function Index() {
 
   return (
     <div className="bg-gray-50">
-      <TranslationForm
-        language={language}
-        availableLanguages={availableLanguages}
-        components={item.components}
-      />
+      <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
+        <TranslationView
+          language={language}
+          components={item.components}
+          availableLanguages={availableLanguages}
+        />
+      </div>
     </div>
   );
 }

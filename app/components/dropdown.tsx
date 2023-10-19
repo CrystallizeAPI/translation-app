@@ -17,15 +17,14 @@ function Dropdown({
         content={
           <div className="shadow bg-[#fff] w-[150px] rounded-md py-1 flex flex-col">
             {options.map((option) => {
-              if (option.code === selectedOption) return null;
               return (
-                <span
-                  onClick={() => onSelectOption(option.code)}
+                <DropdownMenu.Item
+                  onSelect={() => onSelectOption(option.code)}
                   key={option.code}
-                  className="font-medium px-2 py-1 text-sm text-center cursor-pointer hover-bg-purple-50"
+                  className="font-medium px-2 py-1 text-sm text-center cursor-pointer"
                 >
                   {option.name} ({option.code})
-                </span>
+                </DropdownMenu.Item>
               );
             })}
           </div>

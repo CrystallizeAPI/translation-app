@@ -5,6 +5,7 @@ import type {
   ComponentChoiceContent,
   ContentChunkContent,
 } from "~/__generated__/types";
+import type { ComponentsWithTranslation } from "./types";
 
 type UpdateComponent = {
   componentIndex: number;
@@ -13,13 +14,6 @@ type UpdateComponent = {
   translation?: any;
   isTranslating?: boolean;
   isChoice?: boolean;
-};
-
-type Translation = string | { title?: string; body?: string }[];
-
-type ComponentsWithTranslation = Component & {
-  isTranslating?: boolean;
-  translation?: Translation;
 };
 
 type UseTranslationsProps = {
@@ -155,7 +149,7 @@ export const useTranslations = ({
     [translateLanguage, updateComponent]
   );
 
-  const handleTranslate = useCallback(
+  const onTranslate = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -188,9 +182,27 @@ export const useTranslations = ({
     []
   );
 
+  const handlePublishAll = async (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await fetch("/api/update/all-items", {
+      method: "POST",
+      body: JSON.stringify({
+        data: [
+          // ...singleLineTranslations,
+          // ...richTextTranslations,
+          // ...paragraphCollectionTranslations,
+          // ...contentChunkTranslations,
+        ],
+        language: translateLanguage.to,
+        itemId: item.id,
+      }),
+    });
+  };
+
   return {
     componentsWithTranslation,
-    handleTranslate,
+    onTranslate,
     translateLanguage,
     onChangeLanguage,
   };
