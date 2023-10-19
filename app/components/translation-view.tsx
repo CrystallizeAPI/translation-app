@@ -3,6 +3,7 @@ import type { Component } from "~/__generated__/types";
 import { TranslationForm } from "~/components/translation-form";
 import { TranslationToolbar } from "~/components/translation-toolbar";
 import { useTranslations } from "~/use-cases/use-translations";
+import { TranslationProgress } from "~/components/translation-progress";
 
 type TranslationViewProps = {
   language: string;
@@ -20,6 +21,8 @@ export function TranslationView({
     onTranslate,
     translateLanguage,
     onChangeLanguage,
+    currentProcessingTranslationsCount,
+    totalProcessingTranslationsCount,
   } = useTranslations({ language, components });
 
   return (
@@ -29,6 +32,10 @@ export function TranslationView({
         translateLanguage={translateLanguage}
         onChangeLanguage={onChangeLanguage}
         onTranslate={onTranslate}
+      />
+      <TranslationProgress
+        currentProcessingTranslationsCount={currentProcessingTranslationsCount}
+        totalProcessingTranslationsCount={totalProcessingTranslationsCount}
       />
       <TranslationForm components={componentsWithTranslation} />
     </>

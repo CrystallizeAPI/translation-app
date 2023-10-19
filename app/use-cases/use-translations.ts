@@ -5,7 +5,7 @@ import type {
   ComponentChoiceContent,
   ContentChunkContent,
 } from "~/__generated__/types";
-import type { ComponentsWithTranslation } from "./types";
+import type { ComponentsWithTranslation, Preferences } from "./types";
 
 type UpdateComponent = {
   componentIndex: number;
@@ -29,8 +29,15 @@ export const useTranslations = ({
     from: language,
     to: "",
   });
+  const [processingTranslations, setProcessingTranslations] = useState<
+    Map<string, boolean>
+  >(new Map());
   const [componentsWithTranslation, setComponentsWithTranslation] =
     useState<ComponentsWithTranslation[]>(components);
+  const currentProcessingTranslationsCount = [
+    ...processingTranslations.values(),
+  ].filter(Boolean).length;
+  const totalProcessingTranslationsCount = processingTranslations.size;
 
   const updateComponent = useCallback(
     ({
@@ -73,6 +80,9 @@ export const useTranslations = ({
         async (chunkComponents, chunkIndex) => {
           chunkComponents.forEach(
             async (chunkComponent, chunkComponentIndex) => {
+              const id = `${component.id}-${chunkComponentIndex}-${chunkComponent.id}`;
+              setProcessingTranslations((prev) => new Map(prev.set(id, true)));
+
               const base = {
                 componentIndex,
                 chunkIndex,
@@ -93,6 +103,10 @@ export const useTranslations = ({
               } catch {
                 updateComponent({ ...base, isTranslating: false });
                 // TODO: show error message
+              } finally {
+                setProcessingTranslations(
+                  (prev) => new Map(prev.set(id, false))
+                );
               }
             }
           );
@@ -104,6 +118,10 @@ export const useTranslations = ({
 
   const handleChoiceTranslation = useCallback(
     async (component: Component, componentIndex: number) => {
+      setProcessingTranslations(
+        (prev) => new Map(prev.set(component.id, true))
+      );
+
       try {
         updateComponent({
           componentIndex,
@@ -123,6 +141,10 @@ export const useTranslations = ({
       } catch {
         updateComponent({ componentIndex, isTranslating: false });
         // TODO: show error message
+      } finally {
+        setProcessingTranslations(
+          (prev) => new Map(prev.set(component.id, false))
+        );
       }
     },
     [translateLanguage, updateComponent]
@@ -130,6 +152,10 @@ export const useTranslations = ({
 
   const handleBaseComponentTranslation = useCallback(
     async (component: Component, componentIndex: number) => {
+      setProcessingTranslations(
+        (prev) => new Map(prev.set(component.id, true))
+      );
+
       try {
         updateComponent({ componentIndex, isTranslating: true });
         const data = await getComponentTranslation(
@@ -144,15 +170,18 @@ export const useTranslations = ({
       } catch {
         updateComponent({ componentIndex, isTranslating: false });
         // TODO: show error message
+      } finally {
+        setProcessingTranslations(
+          (prev) => new Map(prev.set(component.id, false))
+        );
       }
     },
     [translateLanguage, updateComponent]
   );
 
   const onTranslate = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+    async (preferences: Preferences) => {
+      setProcessingTranslations(new Map());
 
       components.forEach((component, componentIndex) => {
         if (component.type === "contentChunk") {
@@ -205,5 +234,7 @@ export const useTranslations = ({
     onTranslate,
     translateLanguage,
     onChangeLanguage,
+    currentProcessingTranslationsCount,
+    totalProcessingTranslationsCount,
   };
 };
