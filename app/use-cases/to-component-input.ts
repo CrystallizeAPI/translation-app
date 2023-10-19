@@ -203,16 +203,10 @@ function componentHandler(component: Component) {
       const paragraphs =
         (content as ParagraphCollectionContent)?.paragraphs?.map(
           (paragraph: ParagraphContent) => {
-            const { images, videos, title } = paragraph;
-            let { body } = paragraph;
-
-            // Do not allow body: { json: null } [ch203]
-            if (body && "json" in body && !body.json) {
-              body = null;
-            }
+            const { images, videos, title, body } = paragraph;
 
             return {
-              body,
+              body: { html: [body] },
               title: handleSingleLine(title),
               images:
                 images && images?.length
