@@ -50,9 +50,9 @@ export function TranslationForm({ components }: TranslationFormProps) {
 
                         <div className="overflow-hidden rounded-tl-md">
                           {chunk.map((chunkComponent) => {
-                             if (!allowedTypes.includes(chunkComponent.type)) {
+                            if (!allowedTypes.includes(chunkComponent.type)) {
                               return null;
-                            } 
+                            }
 
                             return (
                               <ComponentFactory
@@ -61,10 +61,8 @@ export function TranslationForm({ components }: TranslationFormProps) {
                                 key={chunkComponent.componentId}
                                 component={chunkComponent}
                               />
-                            ) 
-                          }
-                          
-                         )}
+                            );
+                          })}
                         </div>
                       </div>
                     );

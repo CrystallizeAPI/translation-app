@@ -89,8 +89,6 @@ export const useTranslations = ({
 
         component.translationState = translationState;
 
-        console.log({ translationState, translation });
-
         if (translationState === "translated") {
           if (type === ComponentType.SingleLine) {
             component.content = { text: translation };

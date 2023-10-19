@@ -20,7 +20,7 @@ export async function getItemFromPath(id: string, language: string) {
   ${Component}
     `,
     {
-      id: id || "64dcc8084ae8428a30beb442",
+      id: id || "651fb51410fc8c0b9516655a",
       version: "draft",
       language: language || "en",
     }

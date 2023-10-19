@@ -7,7 +7,7 @@ import type {
   RichTextContent,
   SingleLineContent,
 } from "~/__generated__/types";
-import { Icon, Tooltip, IconButton} from '@crystallize/design-system'
+import { Icon, Tooltip, IconButton } from "@crystallize/design-system";
 
 type StructuralColor = {
   text: string;
