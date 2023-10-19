@@ -1,5 +1,7 @@
-import { Button, Icon } from "@crystallize/design-system";
+import { Button, Icon, Label, Checkbox } from "@crystallize/design-system";
+import { useState } from "react";
 import Dropdown from "./dropdown";
+import type { Preferences } from "../use-cases/types";
 
 type TranslateLanguage = {
   from: string;
@@ -10,7 +12,10 @@ type TranslationToolbarProps = {
   availableLanguages: { code: string; name: string }[];
   translateLanguage: TranslateLanguage;
   onChangeLanguage: (translationLanguage: TranslateLanguage) => void;
-  onTranslate: (e: React.FormEvent) => Promise<void>;
+  onTranslate: ({
+    shouldPushTranslationToDraft,
+    shouldIncludeAllVariants,
+  }: Preferences) => void;
 };
 
 export function TranslationToolbar({
@@ -19,6 +24,11 @@ export function TranslationToolbar({
   onChangeLanguage,
   onTranslate,
 }: TranslationToolbarProps) {
+  const [preferences, setPreferences] = useState({
+    shouldPushTranslationToDraft: false,
+    shouldIncludeAllVariants: false,
+  });
+
   return (
     <div className="flex py-8 flex-row justify-between border-solid  border-0 border-b border-gray-200">
       <div className="flex flex-row gap-2 items-center  w-full ">
@@ -46,19 +56,35 @@ export function TranslationToolbar({
       </div>
       <div className="flex gap-8">
         <div className="flex flex-col gap-2">
-          <label className="text-xs whitespace-nowrap flex items-center gap-2">
-            <input type="checkbox" />
+          <Label className="text-xs whitespace-nowrap flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={preferences.shouldPushTranslationToDraft}
+              onCheckedChange={(value: boolean) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  shouldPushTranslationToDraft: value,
+                }))
+              }
+            />
             Add all translations to {translateLanguage.to} draft
-          </label>
-          <label className="text-xs flex items-center gap-2">
-            <input type="checkbox" />
+          </Label>
+          <Label className="text-xs flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={preferences.shouldIncludeAllVariants}
+              onCheckedChange={(value: boolean) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  shouldIncludeAllVariants: value,
+                }))
+              }
+            />
             Include all variants
-          </label>
+          </Label>
         </div>
 
         <Button
           intent="action"
-          onClick={onTranslate}
+          onClick={() => onTranslate(preferences)}
           prepend={<Icon.Language width={20} height={20} />}
           disabled={translateLanguage.to ? false : true}
         >
