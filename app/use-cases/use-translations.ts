@@ -75,7 +75,11 @@ export const useTranslations = ({
   );
 
   const handleChunkTranslation = useCallback(
-    (component: Component, componentIndex: number) => {
+    (
+      component: Component,
+      componentIndex: number,
+      preferences: Preferences
+    ) => {
       (component?.content as ContentChunkContent)?.chunks.forEach(
         async (chunkComponents, chunkIndex) => {
           chunkComponents.forEach(
@@ -93,7 +97,8 @@ export const useTranslations = ({
                 updateComponent({ ...base, isTranslating: true });
                 const data = await getComponentTranslation(
                   translateLanguage,
-                  chunkComponent
+                  chunkComponent,
+                  preferences
                 );
                 updateComponent({
                   ...base,
@@ -117,7 +122,11 @@ export const useTranslations = ({
   );
 
   const handleChoiceTranslation = useCallback(
-    async (component: Component, componentIndex: number) => {
+    async (
+      component: Component,
+      componentIndex: number,
+      preferences: Preferences
+    ) => {
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.id, true))
       );
@@ -130,7 +139,8 @@ export const useTranslations = ({
         });
         const data = await getComponentTranslation(
           translateLanguage,
-          component
+          component,
+          preferences
         );
         updateComponent({
           componentIndex,
@@ -151,7 +161,11 @@ export const useTranslations = ({
   );
 
   const handleBaseComponentTranslation = useCallback(
-    async (component: Component, componentIndex: number) => {
+    async (
+      component: Component,
+      componentIndex: number,
+      preferences: Preferences
+    ) => {
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.id, true))
       );
@@ -160,7 +174,8 @@ export const useTranslations = ({
         updateComponent({ componentIndex, isTranslating: true });
         const data = await getComponentTranslation(
           translateLanguage,
-          component
+          component,
+          preferences
         );
         updateComponent({
           componentIndex,
@@ -185,17 +200,22 @@ export const useTranslations = ({
 
       components.forEach((component, componentIndex) => {
         if (component.type === "contentChunk") {
-          return handleChunkTranslation(component, componentIndex);
+          return handleChunkTranslation(component, componentIndex, preferences);
         }
 
         if (component.type === "componentChoice") {
           return handleChoiceTranslation(
             (component.content as ComponentChoiceContent).selectedComponent,
-            componentIndex
+            componentIndex,
+            preferences
           );
         }
 
-        return handleBaseComponentTranslation(component, componentIndex);
+        return handleBaseComponentTranslation(
+          component,
+          componentIndex,
+          preferences
+        );
       });
     },
     [

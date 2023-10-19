@@ -10,6 +10,16 @@ type TranslationFormProps = {
   components: ComponentsWithTranslation[];
 };
 
+export const colorMap = [
+  { bg: "bg-s-purple-100", text: "text-s-purple-500" },
+  { bg: "bg-s-green-100", text: "text-s-green-600" },
+  { bg: "bg-s-blue-100", text: "text-s-blue-500" },
+  { bg: "bg-green-100", text: "text-green-500" },
+  { bg: "bg-s-orange-100", text: "text-s-orange-500" },
+  { bg: "bg-s-pink-100", text: "text-s-pink-500" },
+  { bg: "bg-cyan-100", text: "text-cyan-600" },
+];
+
 export function TranslationForm({ components }: TranslationFormProps) {
   return (
     <div className="py-6 border-b border-0 border-solid border-gray-200">
@@ -22,16 +32,17 @@ export function TranslationForm({ components }: TranslationFormProps) {
               <div key={component.id} className="space-y-4">
                 {(component.content as ContentChunkContent)?.chunks.map(
                   (chunk, index) => {
+                    const color = colorMap[index % colorMap.length];
                     return (
                       <div
                         key={index}
-                        className="bg-s-pink-100  pl-4 pt-4 rounded-md"
+                        className={`${color.bg} pl-2 pt-4 rounded-md`}
                       >
                         <div className="flex capitalize h-7 pb-4 items-center font-medium text-sm gap-2">
                           <div className="-mr-1">
                             {componentType["contentChunk"]}
                           </div>
-                          <span className="font-medium text-xs text-s-pink-500">
+                          <span className={`font-medium text-xs ${color.text}`}>
                             {component?.id} {`#${index + 1}`}
                           </span>
                         </div>
@@ -39,7 +50,7 @@ export function TranslationForm({ components }: TranslationFormProps) {
                         <div className="overflow-hidden rounded-tl-md">
                           {chunk.map((chunkComponent) => (
                             <ComponentFactory
-                              structuralColor="text-s-pink-500"
+                              structuralColor={color}
                               isStructuralComponent
                               key={chunkComponent.id}
                               component={chunkComponent}
@@ -57,7 +68,7 @@ export function TranslationForm({ components }: TranslationFormProps) {
           if (type === "componentChoice") {
             return (
               <div
-                className="pl-4 pt-4 rounded-md bg-purple-100"
+                className="pl-2 pt-4 rounded-md bg-purple-100"
                 key={component.id}
               >
                 <div className="flex capitalize h-7 pb-4 items-center font-medium text-sm gap-2">
@@ -69,7 +80,10 @@ export function TranslationForm({ components }: TranslationFormProps) {
                 <div className="overflow-hidden rounded-tl-md">
                   <ComponentFactory
                     isStructuralComponent
-                    structuralColor="text-purple-500"
+                    structuralColor={{
+                      bg: "bg-purple-100",
+                      text: "text-purple-500",
+                    }}
                     component={
                       (component.content as ComponentChoiceContent)
                         .selectedComponent

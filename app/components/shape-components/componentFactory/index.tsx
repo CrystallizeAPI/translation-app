@@ -9,7 +9,10 @@ export default function ComponentFactory({
   structuralColor,
 }: {
   isStructuralComponent?: boolean;
-  structuralColor?: string;
+  structuralColor?: {
+    text: string;
+    bg: string;
+  };
   component: {
     id: string;
     type: string;
@@ -23,7 +26,6 @@ export default function ComponentFactory({
         key={component.id}
         data={component}
         isStructuralComponent={isStructuralComponent}
-        structuralColor={structuralColor}
       />
     ),
     richText: (
@@ -31,7 +33,6 @@ export default function ComponentFactory({
         key={component.id}
         data={component}
         isStructuralComponent={isStructuralComponent}
-        structuralColor={structuralColor}
       />
     ),
     paragraphCollection: (
@@ -39,7 +40,6 @@ export default function ComponentFactory({
         key={component.id}
         data={component}
         isStructuralComponent={isStructuralComponent}
-        structuralColor={structuralColor}
       />
     ),
   };
@@ -47,7 +47,7 @@ export default function ComponentFactory({
   const { type, isTranslating, translation } = component;
   if (isStructuralComponent) {
     return (
-      <div className="bg-[#fff] border-b border-solid border-purple-100">
+      <div className="group bg-[#fff] border-b border-solid border-purple-100 ">
         <div className="flex pl-6 pt-2 items-end gap-2 justify-between">
           <div className="flex capitalize h-7 items-center font-medium text-sm gap-2">
             {translation && (
@@ -55,28 +55,37 @@ export default function ComponentFactory({
                 ✓
               </div>
             )}
-            <span className={`${structuralColor} italic font-normal text-xs`}>
+            <span
+              className={`${structuralColor?.text} italic font-normal text-xs`}
+            >
               {component?.id}
             </span>
             {isTranslating && !translation && (
               <div className="border-gray-200 h-4 w-4 animate-spin-slow rounded-full border-[3px] border-t-s-green-600" />
             )}
           </div>
-          <div>
-            {translation && (
-              <div className="flex flex-row gap-2 w-full justify-end">
-                <CopyButton text={translation ?? ""} />
-              </div>
-            )}
-          </div>
         </div>
 
-        {componentTypes[type]}
+        <div className="relative">
+          {componentTypes[type]}
+          {translation && (
+            <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
+              <div className="flex flex-row gap-2 w-full justify-end">
+                <CopyButton text={translation ?? ""} />
+                <Tooltip content="Add this translation to draft">
+                  <IconButton className="!w-7 !h-7">
+                    <Icon.Rocket width="20" height="20" />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
   return (
-    <div>
+    <div className="group">
       <div className="flex pl-2 pt-2 items-end gap-2 justify-between">
         <div className="flex capitalize h-7 pb-2 items-center   font-medium text-sm gap-2">
           {translation ? (
@@ -91,17 +100,22 @@ export default function ComponentFactory({
             <div className="border-gray-200 h-4 w-4 animate-spin-slow rounded-full border-[3px] border-t-s-green-600" />
           )}
         </div>
-        <div>
-          {translation && (
-            <div className="flex flex-row gap-2 w-full justify-end">
-              <CopyButton text={translation ?? ""} />
-            </div>
-          )}
-        </div>
       </div>
 
-      <div className="shadow bg-[#fff] overflow-hidden rounded-md ">
+      <div className=" relative shadow bg-[#fff] overflow-hidden rounded-md ">
         {componentTypes[type]}
+        {translation && (
+          <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
+            <div className="flex flex-row gap-2 w-full justify-end">
+              <CopyButton text={translation ?? ""} />
+              <Tooltip content="Add this translation to draft">
+                <IconButton className="!w-7 !h-7">
+                  <Icon.Rocket width="20" height="20" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
