@@ -5,6 +5,7 @@ import type {
 } from "~/__generated__/types";
 import { componentType } from "./shape-components/helpers";
 import type { ComponentsWithTranslation } from "../use-cases/types";
+import { allowedTypes } from "~/use-cases/allowed-component-types";
 
 type TranslationFormProps = {
   components: ComponentsWithTranslation[];
@@ -29,7 +30,7 @@ export function TranslationForm({ components }: TranslationFormProps) {
 
           if (type === "contentChunk") {
             return (
-              <div key={component.id} className="space-y-4">
+              <div key={component.componentId} className="space-y-4">
                 {(component.content as ContentChunkContent)?.chunks.map(
                   (chunk, index) => {
                     const color = colorMap[index % colorMap.length];
@@ -43,19 +44,27 @@ export function TranslationForm({ components }: TranslationFormProps) {
                             {componentType["contentChunk"]}
                           </div>
                           <span className={`font-medium text-xs ${color.text}`}>
-                            {component?.id} {`#${index + 1}`}
+                            {component?.componentId} {`#${index + 1}`}
                           </span>
                         </div>
 
                         <div className="overflow-hidden rounded-tl-md">
-                          {chunk.map((chunkComponent) => (
-                            <ComponentFactory
-                              structuralColor={color}
-                              isStructuralComponent
-                              key={chunkComponent.id}
-                              component={chunkComponent}
-                            />
-                          ))}
+                          {chunk.map((chunkComponent) => {
+                             if (!allowedTypes.includes(chunkComponent.type)) {
+                              return null;
+                            } 
+
+                            return (
+                              <ComponentFactory
+                                structuralColor={color}
+                                isStructuralComponent
+                                key={chunkComponent.componentId}
+                                component={chunkComponent}
+                              />
+                            ) 
+                          }
+                          
+                         )}
                         </div>
                       </div>
                     );
@@ -65,16 +74,19 @@ export function TranslationForm({ components }: TranslationFormProps) {
             );
           }
 
-          if (type === "componentChoice") {
+          if (
+            type === "componentChoice" &&
+            allowedTypes.includes(component.type)
+          ) {
             return (
               <div
                 className="pl-2 pt-4 rounded-md bg-purple-100"
-                key={component.id}
+                key={component.componentId}
               >
                 <div className="flex capitalize h-7 pb-4 items-center font-medium text-sm gap-2">
                   <div className="-mr-1">{componentType[type]}</div>
                   <span className="font-medium text-xs text-purple-500">
-                    {component?.id}
+                    {component?.componentId}
                   </span>
                 </div>
                 <div className="overflow-hidden rounded-tl-md">
@@ -94,8 +106,12 @@ export function TranslationForm({ components }: TranslationFormProps) {
             );
           }
 
+          if (!allowedTypes.includes(component.type)) {
+            return null;
+          }
+
           return (
-            <div key={component.id}>
+            <div key={component.componentId}>
               <ComponentFactory component={component} />
             </div>
           );

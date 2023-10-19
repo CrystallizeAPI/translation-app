@@ -1,8 +1,13 @@
 import { apiClient } from "../shared";
 
-export async function updateSingleLineComponent(itemId: string, language: string, componentId: string, content: string) {
-   const data = await apiClient.pimApi(
-        `#graphql
+export async function updateSingleLineComponent(
+  itemId: string,
+  language: string,
+  componentId: string,
+  content: string
+) {
+  const data = await apiClient.pimApi(
+    `#graphql
             mutation(
                 $itemId: ID!
                 $language: String!
@@ -19,12 +24,13 @@ export async function updateSingleLineComponent(itemId: string, language: string
                     }
                 }
             }
-        `, {
-        itemId,
-        language,
-        componentId,
-        content
-      }
-    )
-    return data.item.updateComponent;
+        `,
+    {
+      itemId,
+      language,
+      componentId,
+      content,
+    }
+  );
+  return data.item.updateComponent;
 }

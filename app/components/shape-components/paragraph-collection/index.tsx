@@ -1,77 +1,19 @@
-import { componentType } from "../helpers";
 import { CopyButton } from "~/components/copy-button";
-import { IconButton, Icon, Tooltip } from "@crystallize/design-system";
 import TextareaAutosize from "react-textarea-autosize";
+import type { ComponentsWithTranslation } from "~/use-cases/types";
+import type { ParagraphCollectionContent } from "~/__generated__/types";
 
-const ParagraphCollection = ({
+export const ParagraphCollection = ({
   data,
-  item,
-  setEditedTranslation,
-  isStructuralComponent,
-  structuralColor,
 }: {
-  data: any;
-  item: { id: string; language: string };
-  setEditedTranslation: any;
-  isStructuralComponent?: boolean;
-  structuralColor?: string;
+  data: ComponentsWithTranslation;
 }) => {
-  // const handleClick = async (e: any) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-
-  //   try {
-  //     data.paragraphs.map(async (paragraph: any) => {
-  //       const body = {
-  //         id: item.id,
-  //         language: item.language,
-  //         componentId: data.id,
-  //         content: {
-  //           title: { text: paragraph.title || "" },
-  //           body: { html: paragraph.body || "" },
-  //           images:
-  //             paragraph.images.map((image: any) => {
-  //               return { key: image.key };
-  //             }) || [],
-  //         },
-  //         type: "paragraphCollection",
-  //       };
-
-  //       await fetch("/api/update", {
-  //         method: "POST",
-  //         body: JSON.stringify(body),
-  //       });
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const onChange = (e: any, index: number, type: string) => {
-  //   const newParagraphData = { ...data };
-  //   newParagraphData.paragraphs[index][type] = e.target.value;
-  //   setEditedTranslation((prev: any) => {
-  //     return prev.map((i: any) => (i.id === data.id ? newParagraphData : i));
-  //   });
-  // };
-  const paragraphs = data.translation ?? data.content.paragraphs ?? [];
-  const hasTranslation = data.translation?.length > 0;
+  const paragraphs =
+    (data.content as ParagraphCollectionContent)?.paragraphs ?? [];
+  const hasTranslation = data.translationState === "translated";
 
   return (
     <form className="flex flex-col gap-4">
-      {/* <div className="mb-3 flex flex-col gap-2 w-full">
-        <div className="flex  items-center gap-2 justify-between pr-4">
-          <div className="flex capitalize font-medium text-sm gap-2 ">
-            {componentType["paragraphCollection"]}
-            <p>{data.id}</p>
-          </div>
-          <Tooltip content="Add paragraph collection translation to draft">
-            <IconButton variant="elevate" onClick={handleClick}>
-              <Icon.Rocket width="24" height="24" />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <div className="mt-2"> */}
       {paragraphs?.map((el: any, innerIndex: number) => {
         return (
           <div key={innerIndex}>
@@ -85,7 +27,6 @@ const ParagraphCollection = ({
                     ? "text-base font-normal text-gray-400 italic"
                     : "text-base font-medium"
                 }`}
-                onChange={(e) => onChange(e, innerIndex, "title")}
                 readOnly
               />
 
@@ -106,7 +47,6 @@ const ParagraphCollection = ({
                     ? "text-base font-normal text-gray-400 italic "
                     : "text-base font-normal  "
                 }`}
-                onChange={(e) => onChange(e, innerIndex, "body")}
                 readOnly
               />
               {hasTranslation && (
@@ -122,7 +62,7 @@ const ParagraphCollection = ({
                     className="w-32 rounded overflow-hidden p-2 bg-[#fff] shadow"
                     key={index}
                   >
-                    <img src={image?.url} className="w-full " />
+                    <img src={image?.url} className="w-full" alt="Item" />
                   </div>
                 ))}
               </div>
@@ -130,10 +70,6 @@ const ParagraphCollection = ({
           </div>
         );
       })}
-      {/* </div>
-      </div> */}
     </form>
   );
 };
-
-export default ParagraphCollection;

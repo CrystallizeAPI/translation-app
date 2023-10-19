@@ -6,12 +6,14 @@ import { useTranslations } from "~/use-cases/use-translations";
 import { TranslationProgress } from "~/components/translation-progress";
 
 type TranslationViewProps = {
+  itemId: string;
   language: string;
   components: Component[];
   availableLanguages: { code: string; name: string }[];
 };
 
 export function TranslationView({
+  itemId,
   language,
   components,
   availableLanguages,
@@ -23,7 +25,7 @@ export function TranslationView({
     onChangeLanguage,
     currentProcessingTranslationsCount,
     totalProcessingTranslationsCount,
-  } = useTranslations({ language, components });
+  } = useTranslations({ itemId, language, components });
 
   return (
     <div className="pt-4">
