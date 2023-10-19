@@ -26,8 +26,6 @@ export default function Index() {
     return <div>Something went wrong getting your item.</div>;
   }
 
-  console.log(item.components);
-
   return (
     <div className="bg-gray-50">
       <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">

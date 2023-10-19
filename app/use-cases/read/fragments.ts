@@ -266,7 +266,7 @@ const ParagraphCollectionContent = `
         text
       }
       body {
-        json
+        plainText
       }
       images {
         ...Image
