@@ -1,8 +1,9 @@
-import { apiClient } from "../shared";
+import type { ClientInterface } from "@crystallize/js-api-client";
 
-export async function getAvailableLanguages() {
-  const data = await apiClient.pimApi(
-    `#graphql
+export const getAvailableLanguages =
+  (apiClient: ClientInterface) => async () => {
+    const data = await apiClient.pimApi(
+      `#graphql
             query ($identifier: String!) {
                 tenant {
                     get(identifier: $identifier) {
@@ -14,9 +15,10 @@ export async function getAvailableLanguages() {
                 }
             }
         `,
-    {
-      identifier: process.env.CRYSTALLIZE_TENANT_IDENTIFIER,
-    }
-  );
-  return data.tenant.get.availableLanguages;
-}
+      {
+        identifier: process.env.CRYSTALLIZE_TENANT_IDENTIFIER,
+      }
+    );
+
+    return data.tenant.get.availableLanguages;
+  };
