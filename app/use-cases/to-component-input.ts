@@ -206,7 +206,7 @@ function componentHandler(component: Component) {
             const { images, videos, title, body } = paragraph;
 
             return {
-              body: { html: [body] },
+              body: { html: body?.plainText },
               title: handleSingleLine(title),
               images:
                 images && images?.length

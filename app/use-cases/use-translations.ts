@@ -23,12 +23,21 @@ type UseTranslationsProps = {
   itemId: string;
   language: string;
   components: Component[];
+  variantSku?: string;
+};
+
+type HandleTranslationProps = {
+  component: Component;
+  componentIndex: number;
+  preferences: Preferences;
+  variantSku?: string;
 };
 
 export const useTranslations = ({
   itemId,
   language,
   components,
+  variantSku,
 }: UseTranslationsProps) => {
   const [translateLanguage, setTranslateLanguage] = useState({
     from: language,
@@ -51,11 +60,12 @@ export const useTranslations = ({
         body: JSON.stringify({
           component,
           itemId,
+          variantSku,
           language: translateLanguage.to,
         }),
       });
     },
-    [itemId, translateLanguage.to]
+    [itemId, translateLanguage.to, variantSku]
   );
 
   const updateComponent = useCallback(
@@ -110,11 +120,7 @@ export const useTranslations = ({
   );
 
   const handleChunkTranslation = useCallback(
-    (
-      component: Component,
-      componentIndex: number,
-      preferences: Preferences
-    ) => {
+    ({ component, componentIndex, preferences }: HandleTranslationProps) => {
       (component?.content as ContentChunkContent)?.chunks.forEach(
         (chunkComponents, chunkIndex) => {
           chunkComponents.forEach((chunkComponent, chunkComponentIndex) => {
@@ -165,11 +171,11 @@ export const useTranslations = ({
   );
 
   const handleChoiceTranslation = useCallback(
-    async (
-      component: Component,
-      componentIndex: number,
-      preferences: Preferences
-    ) => {
+    async ({
+      component,
+      componentIndex,
+      preferences,
+    }: HandleTranslationProps) => {
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.componentId, true))
       );
@@ -213,11 +219,11 @@ export const useTranslations = ({
   );
 
   const handleBaseComponentTranslation = useCallback(
-    async (
-      component: Component,
-      componentIndex: number,
-      preferences: Preferences
-    ) => {
+    async ({
+      component,
+      componentIndex,
+      preferences,
+    }: HandleTranslationProps) => {
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.componentId, true))
       );
@@ -263,23 +269,21 @@ export const useTranslations = ({
       setProcessingTranslations(new Map());
 
       components.forEach((component, componentIndex) => {
+        const props = { component, componentIndex, preferences };
+
         if (component.type === "contentChunk") {
-          return handleChunkTranslation(component, componentIndex, preferences);
+          return handleChunkTranslation(props);
         }
 
         if (component.type === "componentChoice") {
-          return handleChoiceTranslation(
-            (component.content as ComponentChoiceContent).selectedComponent,
-            componentIndex,
-            preferences
-          );
+          return handleChoiceTranslation({
+            ...props,
+            component: (component.content as ComponentChoiceContent)
+              .selectedComponent,
+          });
         }
 
-        return handleBaseComponentTranslation(
-          component,
-          componentIndex,
-          preferences
-        );
+        return handleBaseComponentTranslation(props);
       });
     },
     [
