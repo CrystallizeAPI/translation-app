@@ -41,7 +41,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Index() {
-  const { itemId, components, language, availableLanguages } =
+  const { itemId, components, language, variantSku, availableLanguages } =
     useLoaderData<typeof loader>();
 
   if (!itemId || !components) {
@@ -53,6 +53,7 @@ export default function Index() {
       <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
         <TranslationView
           itemId={itemId}
+          variantSku={variantSku}
           language={language}
           components={components}
           availableLanguages={availableLanguages}

@@ -105,8 +105,8 @@ export const paragraphCollectionTranslation = async (
         ]);
 
         return {
-          title,
-          body,
+          title: { text: title },
+          body: { plainText: [body] },
           images: paragraph?.images,
         };
       })

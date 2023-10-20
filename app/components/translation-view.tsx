@@ -10,6 +10,7 @@ type TranslationViewProps = {
   language: string;
   components: Component[];
   availableLanguages: { code: string; name: string }[];
+  variantSku?: string;
 };
 
 export function TranslationView({
@@ -17,6 +18,7 @@ export function TranslationView({
   language,
   components,
   availableLanguages,
+  variantSku,
 }: TranslationViewProps) {
   const {
     componentsWithTranslation,
@@ -25,7 +27,7 @@ export function TranslationView({
     onChangeLanguage,
     currentProcessingTranslationsCount,
     totalProcessingTranslationsCount,
-  } = useTranslations({ itemId, language, components });
+  } = useTranslations({ itemId, language, components, variantSku });
 
   return (
     <div className="pt-4">
