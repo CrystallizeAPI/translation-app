@@ -74,7 +74,10 @@ export function TranslationForm({ components }: TranslationFormProps) {
 
           if (
             type === "componentChoice" &&
-            allowedTypes.includes(component.type)
+            allowedTypes.includes(
+              (component?.content as ComponentChoiceContent)?.selectedComponent
+                .type
+            )
           ) {
             return (
               <div
