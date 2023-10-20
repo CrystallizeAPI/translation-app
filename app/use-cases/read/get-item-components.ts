@@ -21,7 +21,7 @@ export const getItemComponents =
   ${Component}
     `,
       {
-        id: id,
+        id: id ?? "651fb51410fc8c0b9516655a",
         version: "draft",
         language: language || "en",
       }
