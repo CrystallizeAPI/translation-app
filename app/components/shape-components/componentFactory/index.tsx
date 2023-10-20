@@ -1,7 +1,7 @@
 import { SingleLine, RichText, ParagraphCollection } from "../index";
 import { CopyButton } from "~/components/copy-button";
 import { componentType } from "../helpers";
-import type { ComponentsWithTranslation } from "~/use-cases/types";
+import type { ComponentWithTranslation } from "~/use-cases/types";
 import type {
   ParagraphCollectionContent,
   RichTextContent,
@@ -14,7 +14,7 @@ type StructuralColor = {
   bg: string;
 };
 
-const getTranslation = (component: ComponentsWithTranslation) => {
+const getTranslation = (component: ComponentWithTranslation) => {
   if (component.type === "singleLine") {
     return (component.content as SingleLineContent)?.text ?? "";
   }
@@ -41,7 +41,7 @@ export default function ComponentFactory({
 }: {
   isStructuralComponent?: boolean;
   structuralColor?: StructuralColor;
-  component: ComponentsWithTranslation;
+  component: ComponentWithTranslation;
 }) {
   const componentTypes = {
     singleLine: <SingleLine key={component.componentId} data={component} />,

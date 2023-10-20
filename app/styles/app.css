@@ -948,11 +948,6 @@ video {
   border-color: rgb(30 182 3 / var(--tw-border-opacity));
 }
 
-.border-cyan-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(115 229 237 / var(--tw-border-opacity));
-}
-
 .border-green-200 {
   --tw-border-opacity: 1;
   border-color: rgb(195 218 222 / var(--tw-border-opacity));
@@ -1048,28 +1043,8 @@ video {
   background-color: rgb(235 232 255 / var(--tw-bg-opacity));
 }
 
-.bg-s-yellow-50 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 254 232 / var(--tw-bg-opacity));
-}
-
 .bg-\[transparent\] {
   background-color: transparent;
-}
-
-.bg-purple-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(216 213 226 / var(--tw-bg-opacity));
-}
-
-.bg-s-red-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 108 108 / var(--tw-bg-opacity));
-}
-
-.bg-s-yellow-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 255 182 / var(--tw-bg-opacity));
 }
 
 .bg-cyan-50 {
@@ -1351,16 +1326,6 @@ video {
 .focus\:bg-purple-50:focus {
   --tw-bg-opacity: 1;
   background-color: rgb(247 246 249 / var(--tw-bg-opacity));
-}
-
-.focus\:bg-s-yellow-100:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 255 182 / var(--tw-bg-opacity));
-}
-
-.focus\:bg-cyan-100:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(191 246 248 / var(--tw-bg-opacity));
 }
 
 .focus\:bg-\[\#fff\]:focus {

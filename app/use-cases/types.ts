@@ -6,11 +6,19 @@ export type Preferences = {
   customPromptFromUser?: string;
 };
 
+type TranslationState = "translating" | "translated" | "error";
 export type Translation = string | { title?: string; body?: string }[];
 
-export type ComponentsWithTranslation = Component & {
-  translationState?: "translating" | "translated" | "error";
+type PropertyName = {
+  type: "name";
+  content: string;
 };
-export type Properties = {
-  name: string;
+export type Property = PropertyName;
+
+export type ComponentWithTranslation = Component & {
+  translationState?: TranslationState;
+};
+
+export type PropertyWithTranslation = Property & {
+  translationState?: TranslationState;
 };

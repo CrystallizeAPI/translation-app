@@ -5,7 +5,7 @@ import { TranslationToolbar } from "~/components/translation-toolbar";
 import { TranslationProgress } from "~/components/translation-progress";
 import { TranslationProperties } from "~/components/translation-properties";
 import { useTranslations } from "~/use-cases/use-translations";
-import { Properties } from "~/use-cases/types";
+import type { Property } from "~/use-cases/types";
 
 type TranslationViewProps = {
   itemId: string;
@@ -13,7 +13,7 @@ type TranslationViewProps = {
   components: Component[];
   availableLanguages: { code: string; name: string }[];
   variantSku?: string;
-  properties: Properties;
+  properties: Property[];
 };
 
 export function TranslationView({
@@ -25,7 +25,8 @@ export function TranslationView({
   variantSku,
 }: TranslationViewProps) {
   const {
-    componentsWithTranslation,
+    ComponentWithTranslation,
+    propertiesWithTranslation,
     onTranslate,
     translateLanguage,
     onChangeLanguage,
@@ -46,10 +47,10 @@ export function TranslationView({
         totalProcessingTranslationsCount={totalProcessingTranslationsCount}
       />
       <TranslationProperties
-        properties={properties}
+        properties={propertiesWithTranslation}
         onPropertiesChange={() => {}}
       />
-      <TranslationForm components={componentsWithTranslation} />
+      <TranslationForm components={ComponentWithTranslation} />
     </div>
   );
 }

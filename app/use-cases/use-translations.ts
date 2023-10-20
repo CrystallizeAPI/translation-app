@@ -7,9 +7,10 @@ import type {
 } from "~/__generated__/types";
 import { ComponentType } from "~/__generated__/types";
 import type {
-  ComponentsWithTranslation,
+  ComponentWithTranslation,
   Preferences,
   Properties,
+  PropertyWithTranslation,
 } from "./types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
 
@@ -19,7 +20,7 @@ type UpdateComponent = {
   chunkIndex?: number;
   chunkComponentIndex?: number;
   translation?: any;
-  translationState?: ComponentsWithTranslation["translationState"];
+  translationState?: ComponentWithTranslation["translationState"];
   isChoice?: boolean;
 };
 
@@ -52,16 +53,18 @@ export const useTranslations = ({
   const [processingTranslations, setProcessingTranslations] = useState<
     Map<string, boolean>
   >(new Map());
-  // const [propertiesWithTranslation, setPropertiesWithTranslation] = useState();
-  const [componentsWithTranslation, setComponentsWithTranslation] =
-    useState<ComponentsWithTranslation[]>(components);
+  const [propertiesWithTranslation, setPropertiesWithTranslation] =
+    useState<PropertyWithTranslation[]>(properties);
+  const [ComponentWithTranslation, setComponentWithTranslation] =
+    useState<ComponentWithTranslation[]>(components);
+
   const currentProcessingTranslationsCount = [
     ...processingTranslations.values(),
   ].filter(Boolean).length;
   const totalProcessingTranslationsCount = processingTranslations.size;
 
   const onUpdateComponent = useCallback(
-    async (component: ComponentsWithTranslation) => {
+    async (component: ComponentWithTranslation) => {
       await fetch("/api/update/component", {
         method: "POST",
         body: JSON.stringify({
@@ -85,9 +88,9 @@ export const useTranslations = ({
       isChoice = false,
       translationState,
     }: UpdateComponent) => {
-      let rootComponent: ComponentsWithTranslation | undefined = undefined;
+      let rootComponent: ComponentWithTranslation | undefined = undefined;
 
-      setComponentsWithTranslation((prev) => {
+      setComponentWithTranslation((prev) => {
         const copy = [...prev];
         let component = copy[componentIndex];
 
@@ -101,7 +104,7 @@ export const useTranslations = ({
           component = (copy[componentIndex].content as ContentChunkContent)
             .chunks[chunkIndex][
             chunkComponentIndex
-          ] as ComponentsWithTranslation;
+          ] as ComponentWithTranslation;
         }
 
         component.translationState = translationState;
@@ -306,7 +309,8 @@ export const useTranslations = ({
   );
 
   return {
-    componentsWithTranslation,
+    ComponentWithTranslation,
+    propertiesWithTranslation,
     onTranslate,
     translateLanguage,
     onChangeLanguage,
