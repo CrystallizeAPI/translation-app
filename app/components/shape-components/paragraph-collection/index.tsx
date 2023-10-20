@@ -29,12 +29,6 @@ export const ParagraphCollection = ({
                 }`}
                 readOnly
               />
-
-              {hasTranslation && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 ">
-                  <CopyButton text={el?.title} variant="default" />
-                </div>
-              )}
             </div>
             <div className="w-full relative flex">
               <TextareaAutosize
@@ -49,11 +43,6 @@ export const ParagraphCollection = ({
                 }`}
                 readOnly
               />
-              {hasTranslation && (
-                <div className="absolute right-4 top-3 ">
-                  <CopyButton text={el?.body} variant="default" />
-                </div>
-              )}
             </div>
             {el?.images && (
               <div className="px-6 py-6 flex gap-2">
