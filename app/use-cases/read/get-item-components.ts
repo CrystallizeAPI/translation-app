@@ -10,6 +10,7 @@ export const getItemComponents =
       item {
        get(id: $id, language: $language, versionLabel: $versionLabel) {
         id
+        name
         language
         type
         components {

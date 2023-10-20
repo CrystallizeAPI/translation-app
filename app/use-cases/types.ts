@@ -11,3 +11,6 @@ export type Translation = string | { title?: string; body?: string }[];
 export type ComponentsWithTranslation = Component & {
   translationState?: "translating" | "translated" | "error";
 };
+export type Properties = {
+  name: string;
+};

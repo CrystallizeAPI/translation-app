@@ -32,11 +32,11 @@ export function TranslationToolbar({
   });
 
   return (
-    <div className="border-solid bg-[#fff] shadow-md rounded-md overflow-hidden">
-      <div className="border-0 border-b border-gray-100 flex justify-between items-center pr-6">
+    <div className="border-solid bg-cyan-50 shadow-md shadow-cyan-500 rounded-md overflow-hidden">
+      <div className="border-0 border-b border-green-200 flex justify-between items-center pr-6">
         <input
           value={preferences.customPromptFromUser}
-          className="pl-6 py-4 pt-6 w-full placeholder:italic outline-none focus:bg-purple-50"
+          className="pl-6 py-4 pt-6 w-full bg-[transparent] placeholder:italic outline-none focus:bg-[#fff]"
           placeholder="Add your own twist, i.e speak like a pirate (optional)."
           onChange={(e) =>
             setPreferences((prev) => ({
@@ -56,8 +56,8 @@ export function TranslationToolbar({
           </Button>
         </div>
       </div>
-      <div className="flex flex-row px-6 py-2">
-        <div className="flex flex-row gap-2 items-center  w-full ">
+      <div className="flex flex-row px-6 py-2 flex-wrap gap-y-6">
+        <div className="flex flex-row gap-2 items-center pr-4 ">
           <div>
             <Dropdown
               options={availableLanguages}

@@ -30,7 +30,7 @@ function Dropdown({
           </div>
         }
       >
-        <Button append={<Icon.Arrow />}>
+        <Button append={<Icon.Arrow />} variant="elevate">
           <span className="min-w-[100px]">
             {selectedOption ?? (
               <span className="italic font-normal mx-2">{buttonText}</span>

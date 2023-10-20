@@ -12,6 +12,7 @@ export const getVariantComponents =
        get(id: $id, language: $language, versionLabel: $versionLabel) {
         id
         language
+        name
         variant(sku: $sku) {
           id
           components {
