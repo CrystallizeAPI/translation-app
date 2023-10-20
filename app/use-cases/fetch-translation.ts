@@ -11,13 +11,20 @@ export const fetchTranslation = async (
   preferences: Preferences
 ) => {
   const { from, to } = translateLanguage;
-  return await fetch("/api/translate/v2", {
+  const chatgpt = await fetch("/api/translate/v2", {
     method: "POST",
     body: JSON.stringify({
       role: "user",
-      content: `Translate the text delimited by triple quotes from ${from} to ${to}. ${preferences.customPromptFromUser}. The returned translation should contain no quotes.\n\n\"\"\"${text}\"\"\"`,
+      content: `Translate from ${from} to ${to} (delimited with XML tags). ${
+        preferences.customPromptFromUser
+          ? `And ${preferences.customPromptFromUser}`
+          : ""
+      }. <translation>${text}</translation>`,
     }),
   });
+  const result = await chatgpt.text();
+
+  return result.replace(/<[^>]*>/g, "");
 };
 
 export const singleLineTranslation = async (
@@ -35,7 +42,7 @@ export const singleLineTranslation = async (
   return {
     id: component.id,
     type: "singleLine",
-    translation: (await translation.text()) || "",
+    translation: translation || "",
   };
 };
 
@@ -44,15 +51,22 @@ export const richTextTranslation = async (
   translateLanguage: Language,
   preferences: Preferences
 ) => {
+  if (!component?.content?.plainText) {
+    return {
+      id: component.id,
+      type: "richText",
+      translation: null,
+    };
+  }
   const translation = await fetchTranslation(
-    component?.content?.plainText.toString(),
+    component?.content?.plainText.toString() ?? "",
     translateLanguage,
     preferences
   );
   return {
     id: component.id,
     type: "richText",
-    translation: [await translation.text()],
+    translation: [translation],
   };
 };
 
@@ -73,19 +87,19 @@ export const paragraphCollectionTranslation = async (
                 translateLanguage,
                 preferences
               )
-            : undefined,
+            : null,
           paragraph?.body
             ? fetchTranslation(
                 paragraph.body.plainText.toString(),
                 translateLanguage,
                 preferences
               )
-            : undefined,
+            : null,
         ]);
 
         return {
-          title: await title?.text(),
-          body: await body?.text(),
+          title,
+          body,
           images: paragraph?.images,
         };
       })
