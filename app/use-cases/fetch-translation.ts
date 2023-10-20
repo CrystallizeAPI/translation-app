@@ -10,6 +10,12 @@ export const fetchTranslation = async (
   translateLanguage: Language,
   preferences: Preferences
 ) => {
+  const textToTranslate = text?.trim();
+
+  if (!textToTranslate) {
+    return "";
+  }
+
   const { from, to } = translateLanguage;
   const chatgpt = await fetch("/api/translate/v2", {
     method: "POST",
@@ -19,9 +25,10 @@ export const fetchTranslation = async (
         preferences.customPromptFromUser
           ? `And ${preferences.customPromptFromUser}`
           : ""
-      }. <translation>${text}</translation>`,
+      }. <translation>${textToTranslate}</translation>`,
     }),
   });
+
   const result = await chatgpt.text();
 
   return result.replace(/<[^>]*>/g, "");

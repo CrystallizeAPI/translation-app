@@ -186,13 +186,16 @@ export const useTranslations = ({
           component,
           preferences
         );
-        updateComponent({
+        const updatedComponent = updateComponent({
           type: component.type,
           componentIndex,
           translationState: "translated",
           translation: data?.translation,
           isChoice: true,
         });
+        preferences.shouldPushTranslationToDraft &&
+          !!updatedComponent &&
+          onUpdateComponent(updatedComponent);
       } catch {
         updateComponent({
           type: component.type,
@@ -206,7 +209,7 @@ export const useTranslations = ({
         );
       }
     },
-    [translateLanguage, updateComponent]
+    [translateLanguage, updateComponent, onUpdateComponent]
   );
 
   const handleBaseComponentTranslation = useCallback(
