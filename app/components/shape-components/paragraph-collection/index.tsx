@@ -1,12 +1,12 @@
 import { CopyButton } from "~/components/copy-button";
 import TextareaAutosize from "react-textarea-autosize";
-import type { ComponentsWithTranslation } from "~/use-cases/types";
+import type { ComponentWithTranslation } from "~/use-cases/types";
 import type { ParagraphCollectionContent } from "~/__generated__/types";
 
 export const ParagraphCollection = ({
   data,
 }: {
-  data: ComponentsWithTranslation;
+  data: ComponentWithTranslation;
 }) => {
   const paragraphs =
     (data.content as ParagraphCollectionContent)?.paragraphs ?? [];

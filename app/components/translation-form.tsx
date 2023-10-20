@@ -4,11 +4,11 @@ import type {
   ComponentChoiceContent,
 } from "~/__generated__/types";
 import { componentType } from "./shape-components/helpers";
-import type { ComponentsWithTranslation } from "../use-cases/types";
+import type { ComponentWithTranslation } from "../use-cases/types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
 
 type TranslationFormProps = {
-  components: ComponentsWithTranslation[];
+  components: ComponentWithTranslation[];
 };
 
 export const colorMap = [

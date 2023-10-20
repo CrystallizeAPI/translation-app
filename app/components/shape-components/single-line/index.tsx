@@ -1,7 +1,7 @@
-import type { ComponentsWithTranslation } from "~/use-cases/types";
+import type { ComponentWithTranslation } from "~/use-cases/types";
 import type { SingleLineContent } from "~/__generated__/types";
 
-export const SingleLine = ({ data }: { data: ComponentsWithTranslation }) => {
+export const SingleLine = ({ data }: { data: ComponentWithTranslation }) => {
   const hasTranslation = data?.translationState === "translated";
 
   return (

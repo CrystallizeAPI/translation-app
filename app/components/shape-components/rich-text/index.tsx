@@ -1,8 +1,8 @@
 import TextareaAutosize from "react-textarea-autosize";
-import type { ComponentsWithTranslation } from "~/use-cases/types";
+import type { ComponentWithTranslation } from "~/use-cases/types";
 import type { RichTextContent } from "~/__generated__/types";
 
-export const RichText = ({ data }: { data: ComponentsWithTranslation }) => {
+export const RichText = ({ data }: { data: ComponentWithTranslation }) => {
   const hasTranslation = data.translationState === "translated";
 
   return (
