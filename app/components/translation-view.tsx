@@ -45,7 +45,10 @@ export function TranslationView({
         currentProcessingTranslationsCount={currentProcessingTranslationsCount}
         totalProcessingTranslationsCount={totalProcessingTranslationsCount}
       />
-      <TranslationProperties properties={properties} />
+      <TranslationProperties
+        properties={properties}
+        onPropertiesChange={() => {}}
+      />
       <TranslationForm components={componentsWithTranslation} />
     </div>
   );
