@@ -11,14 +11,13 @@ import {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const itemId = url.searchParams.get("itemId") ?? "651fb51410fc8c0b9516655a";
-  const variantSku =
-    url.searchParams.get("variantSku") ?? "superb-product-1696576788589";
+  const variantSku = url.searchParams.get("variantSku") ?? undefined;
   const itemLanguageCode = url.searchParams.get("language") ?? "en";
 
   const availableLanguages = await getAvailableLanguages(apiClient)();
 
   let components;
-
+  let properties;
   if (variantSku) {
     const data = await getVariantComponents(apiClient)(
       itemId,
@@ -26,13 +25,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       variantSku
     );
     components = data?.variant?.components;
+    properties = { name: data?.variant?.name ?? "" };
   } else {
     const item = await getItemComponents(apiClient)(itemId, itemLanguageCode);
     components = item?.components;
+    properties = { name: item?.name ?? "" };
   }
 
   return json({
     itemId,
+    properties,
     variantSku,
     components,
     language: itemLanguageCode,
@@ -41,13 +43,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Index() {
-  const { itemId, components, language, variantSku, availableLanguages } =
-    useLoaderData<typeof loader>();
+  const {
+    itemId,
+    components,
+    language,
+    variantSku,
+    availableLanguages,
+    properties,
+  } = useLoaderData<typeof loader>();
 
   if (!itemId || !components) {
     return <div>Something went wrong getting your item.</div>;
   }
-
   return (
     <div className="bg-gray-50">
       <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
@@ -57,6 +64,7 @@ export default function Index() {
           language={language}
           components={components}
           availableLanguages={availableLanguages}
+          properties={properties}
         />
       </div>
     </div>

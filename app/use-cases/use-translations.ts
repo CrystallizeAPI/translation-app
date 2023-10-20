@@ -6,7 +6,11 @@ import type {
   ContentChunkContent,
 } from "~/__generated__/types";
 import { ComponentType } from "~/__generated__/types";
-import type { ComponentsWithTranslation, Preferences } from "./types";
+import type {
+  ComponentsWithTranslation,
+  Preferences,
+  Properties,
+} from "./types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
 
 type UpdateComponent = {
@@ -24,6 +28,7 @@ type UseTranslationsProps = {
   language: string;
   components: Component[];
   variantSku?: string;
+  properties: Properties;
 };
 
 type HandleTranslationProps = {
@@ -38,6 +43,7 @@ export const useTranslations = ({
   language,
   components,
   variantSku,
+  properties,
 }: UseTranslationsProps) => {
   const [translateLanguage, setTranslateLanguage] = useState({
     from: language,
@@ -46,6 +52,7 @@ export const useTranslations = ({
   const [processingTranslations, setProcessingTranslations] = useState<
     Map<string, boolean>
   >(new Map());
+  // const [propertiesWithTranslation, setPropertiesWithTranslation] = useState();
   const [componentsWithTranslation, setComponentsWithTranslation] =
     useState<ComponentsWithTranslation[]>(components);
   const currentProcessingTranslationsCount = [
@@ -217,7 +224,6 @@ export const useTranslations = ({
     },
     [translateLanguage, updateComponent, onUpdateComponent]
   );
-
   const handleBaseComponentTranslation = useCallback(
     async ({
       component,
