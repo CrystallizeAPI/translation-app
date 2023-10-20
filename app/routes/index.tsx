@@ -1,16 +1,16 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { TranslationView } from "~/components/translation-view";
-import { getApi } from "~/use-cases/api";
+import { apiClient } from "~/use-cases/shared";
+import { getItemComponents, getAvailableLanguages } from "~/use-cases/read";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const api = await getApi(request);
   const url = new URL(request.url);
   const itemId = url.searchParams.get("itemId");
   const itemLanguageCode = url.searchParams.get("language") ?? "en";
 
-  const item = await api.getItemComponents(itemId!, itemLanguageCode!);
-  const availableLanguages = await api.getAvailableLanguages();
+  const item = await getItemComponents(apiClient)(itemId!, itemLanguageCode!);
+  const availableLanguages = await getAvailableLanguages(apiClient)();
 
   return json({
     item,
