@@ -98,7 +98,7 @@ export default function ComponentFactory({
   return (
     <div className="group">
       <div className="flex pl-2 pt-2 items-end gap-2 justify-between">
-        <div className="flex capitalize h-7 pb-2 items-center   font-medium text-sm gap-2">
+        <div className="flex capitalize h-7 pb-2 items-center font-medium text-sm gap-2">
           {hasTranslation ? (
             <div className="bg-s-green-600 rounded-full justify-center w-4 h-4 text-[10px] font-medium flex items-center text-[#fff]">
               ✓
@@ -113,7 +113,7 @@ export default function ComponentFactory({
         </div>
       </div>
 
-      <div className=" relative shadow bg-[#fff] overflow-hidden rounded-md ">
+      <div className="relative shadow bg-[#fff] overflow-hidden rounded-md ">
         {componentTypes[type]}
         {hasTranslation && (
           <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">

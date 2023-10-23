@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import { getComponentTranslation } from "~/use-cases/fetch-translation";
+import {
+  getComponentTranslation,
+  fetchTranslation,
+} from "~/use-cases/fetch-translation";
 import type {
   Component,
   ComponentChoiceContent,
   ContentChunkContent,
+  ItemType,
 } from "~/__generated__/types";
 import { ComponentType } from "~/__generated__/types";
 import type {
   ComponentWithTranslation,
   Preferences,
-  Properties,
   PropertyWithTranslation,
 } from "./types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
@@ -27,12 +30,19 @@ type UpdateComponent = {
   isChoice?: boolean;
 };
 
+type UpdateProperty = {
+  propertyIndex: number;
+  translation?: any;
+  translationState?: ComponentWithTranslation["translationState"];
+};
+
 type UseTranslationsProps = {
   itemId: string;
+  itemType: ItemType;
   language: string;
-  components: Component[];
+  properties: PropertyWithTranslation[];
+  components?: Component[];
   variantSku?: string;
-  properties: Properties;
 };
 
 type HandleTranslationProps = {
@@ -42,8 +52,15 @@ type HandleTranslationProps = {
   component?: Component;
 };
 
+type HandlePropertyProps = {
+  property: PropertyWithTranslation;
+  propertyIndex: number;
+  preferences: Preferences;
+};
+
 export const useTranslations = ({
   itemId,
+  itemType,
   language,
   components,
   variantSku,
@@ -59,8 +76,9 @@ export const useTranslations = ({
   >(new Map());
   const [propertiesWithTranslation, setPropertiesWithTranslation] =
     useState<PropertyWithTranslation[]>(properties);
-  const [componentWithTranslation, setComponentWithTranslation] =
-    useState<ComponentWithTranslation[]>(components);
+  const [componentWithTranslation, setComponentWithTranslation] = useState<
+    ComponentWithTranslation[] | undefined
+  >(components);
 
   const currentProcessingTranslationsCount = [
     ...processingTranslations.values(),
@@ -76,23 +94,24 @@ export const useTranslations = ({
   }, [fetcher.data]);
 
   const onUpdateComponent = useCallback(
-    async (component: ComponentWithTranslation) => {
+    async (
+      translation: ComponentWithTranslation | PropertyWithTranslation,
+      type: string = "component"
+    ) => {
       const formData = new FormData();
-      formData.append(
-        "data",
-        JSON.stringify({
-          component,
-          itemId,
-          variantSku,
-          language: translateLanguage.to,
-        })
-      );
+      const data = JSON.stringify({
+        translation,
+        type,
+        itemType,
+        itemId,
+        variantSku,
+        language: translateLanguage.to,
+      });
 
+      formData.append("data", data);
       fetcher.submit(formData, { method: "POST" });
-
-      // refetchItemComponents();
     },
-    [itemId, translateLanguage.to, variantSku, fetcher]
+    [itemId, translateLanguage.to, variantSku, fetcher, itemType]
   );
 
   const updateComponent = useCallback(
@@ -107,7 +126,7 @@ export const useTranslations = ({
     }: UpdateComponent) => {
       let rootComponent: ComponentWithTranslation | undefined = undefined;
 
-      setComponentWithTranslation((prev) => {
+      setComponentWithTranslation((prev = []) => {
         const copy = [...prev];
         let component = copy[componentIndex];
 
@@ -142,6 +161,29 @@ export const useTranslations = ({
       });
 
       return rootComponent;
+    },
+    []
+  );
+
+  const updateProperty = useCallback(
+    ({ propertyIndex, translation, translationState }: UpdateProperty) => {
+      let updatedProperty: PropertyWithTranslation | undefined = undefined;
+
+      setPropertiesWithTranslation((prev) => {
+        const copy = [...prev];
+        let property = copy[propertyIndex];
+
+        property.translationState = translationState;
+        if (translation) {
+          property.content = translation;
+        }
+
+        updatedProperty = copy[propertyIndex];
+
+        return copy;
+      });
+
+      return updatedProperty;
     },
     []
   );
@@ -298,11 +340,57 @@ export const useTranslations = ({
     [translateLanguage, updateComponent, onUpdateComponent]
   );
 
+  const handleNameTranslation = useCallback(
+    async ({ property, propertyIndex, preferences }: HandlePropertyProps) => {
+      setProcessingTranslations(
+        (prev) => new Map(prev.set(property.type, true))
+      );
+
+      try {
+        updateProperty({ propertyIndex, translationState: "translating" });
+        const translation = await fetchTranslation(
+          property.content,
+          translateLanguage,
+          preferences
+        );
+        const updatedProperty = updateProperty({
+          propertyIndex,
+          translation,
+          translationState: "translated",
+        });
+        preferences.shouldPushTranslationToDraft &&
+          !!updatedProperty &&
+          onUpdateComponent(updatedProperty, "property");
+      } catch {
+        updateProperty({
+          propertyIndex,
+          translationState: "error",
+        });
+        // TODO: show error message
+      } finally {
+        setProcessingTranslations(
+          (prev) => new Map(prev.set(property.type, false))
+        );
+      }
+    },
+    [translateLanguage, updateProperty, onUpdateComponent]
+  );
+
   const onTranslate = useCallback(
     (preferences: Preferences) => {
       setProcessingTranslations(new Map());
 
-      components.forEach((component, componentIndex) => {
+      properties.forEach((property, propertyIndex) => {
+        if (property.type === "name") {
+          return handleNameTranslation({
+            property,
+            propertyIndex,
+            preferences,
+          });
+        }
+      });
+
+      components?.forEach((component, componentIndex) => {
         const props = { component, componentIndex, preferences };
 
         if (component.type === "contentChunk") {
@@ -323,9 +411,11 @@ export const useTranslations = ({
     },
     [
       components,
+      properties,
       handleChoiceTranslation,
       handleChunkTranslation,
       handleBaseComponentTranslation,
+      handleNameTranslation,
     ]
   );
 

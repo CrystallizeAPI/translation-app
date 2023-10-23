@@ -8,7 +8,7 @@ import type { ComponentWithTranslation } from "../use-cases/types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
 
 type TranslationFormProps = {
-  components: ComponentWithTranslation[];
+  components?: ComponentWithTranslation[];
 };
 
 export const colorMap = [
@@ -23,9 +23,9 @@ export const colorMap = [
 
 export function TranslationForm({ components }: TranslationFormProps) {
   return (
-    <div className="py-6 border-b border-0 border-solid border-gray-200">
+    <div className="my-6 border-b border-0 border-solid border-gray-200">
       <div className="space-y-4">
-        {components.map((component) => {
+        {components?.map((component) => {
           const { type } = component;
 
           if (type === "contentChunk") {

@@ -5,7 +5,11 @@ import {
   getItemComponents,
   getVariantComponents,
 } from "./read";
-import { updateItemComponent, updateVariantComponent } from "./write";
+import {
+  updateItemComponent,
+  updateVariantComponent,
+  updateItemName,
+} from "./write";
 
 export const getApi = async (request: Request) => {
   const signatureChecked = await requireValidSession(request);
@@ -33,5 +37,8 @@ export const getApi = async (request: Request) => {
     updateVariantComponent: async (
       ...params: Parameters<ReturnType<typeof updateVariantComponent>>
     ) => updateVariantComponent(apiClient)(...params),
+    updateItemName: async (
+      ...params: Parameters<ReturnType<typeof updateItemName>>
+    ) => updateItemName(apiClient)(...params),
   };
 };

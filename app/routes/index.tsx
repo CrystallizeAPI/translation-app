@@ -4,7 +4,7 @@ import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
-import type { Component } from "~/__generated__/types";
+import { type Component, ItemType } from "~/__generated__/types";
 import { useLoaderData } from "@remix-run/react";
 import { toComponentInput } from "~/use-cases/to-component-input";
 import { TranslationView } from "~/components/translation-view";
@@ -27,19 +27,22 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   let components;
   let properties;
+  let itemType = ItemType.Product;
 
   if (variantSku) {
     const data = await api.getVariantComponents(itemId, language, variantSku);
     components = data?.variant?.components;
-    properties = { name: data?.variant?.name ?? "" };
+    properties = [{ type: "name", content: data?.variant?.name ?? "" }];
   } else {
     const item = await api.getItemComponents(itemId, language);
     components = item?.components;
-    properties = { name: item?.name ?? "" };
+    properties = [{ type: "name", content: item?.name ?? "" }];
+    itemType = item?.type as ItemType;
   }
 
   return json({
     itemId,
+    itemType,
     properties,
     variantSku,
     components,
@@ -53,10 +56,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     const body = await request.formData();
-    const { itemId, language, component, variantSku } = JSON.parse(
-      (body.get("data") ?? "") as string
-    );
-    const input = toComponentInput(component as Component);
+    const { type, itemId, itemType, language, translation, variantSku } =
+      JSON.parse((body.get("data") ?? "") as string);
+
+    if (type === "property") {
+      await api.updateItemName({
+        id: itemId,
+        itemType,
+        language,
+        input: { name: translation.content },
+      });
+
+      return json({ itemId, language, type: "refetchItem" });
+    }
+
+    const input = toComponentInput(translation as Component);
 
     if (variantSku) {
       await api.updateVariantComponent({
@@ -70,7 +84,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await api.updateItemComponent({ itemId, language, input });
       return json({ itemId, language, type: "refetchItemComponents" });
     }
-  } catch {}
+  } catch (e) {
+    console.log(e);
+  }
 
   return null;
 };
@@ -78,6 +94,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Index() {
   const {
     itemId,
+    itemType,
     components,
     language,
     variantSku,
@@ -85,7 +102,7 @@ export default function Index() {
     properties,
   } = useLoaderData<typeof loader>();
 
-  if (!itemId || !components) {
+  if (!itemId) {
     return <div>Something went wrong getting your item.</div>;
   }
   return (
@@ -93,6 +110,7 @@ export default function Index() {
       <div className="min-h-[100vh] pb-24 max-w-[1200px] mx-auto px-8">
         <TranslationView
           itemId={itemId}
+          itemType={itemType}
           variantSku={variantSku}
           language={language}
           components={components}
