@@ -25,7 +25,7 @@ export function TranslationView({
   variantSku,
 }: TranslationViewProps) {
   const {
-    ComponentWithTranslation,
+    componentWithTranslation,
     propertiesWithTranslation,
     onTranslate,
     translateLanguage,
@@ -50,7 +50,7 @@ export function TranslationView({
         properties={propertiesWithTranslation}
         onPropertiesChange={() => {}}
       />
-      <TranslationForm components={ComponentWithTranslation} />
+      <TranslationForm components={componentWithTranslation} />
     </div>
   );
 }

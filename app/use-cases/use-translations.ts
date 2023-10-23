@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getComponentTranslation } from "~/use-cases/fetch-translation";
 import type {
   Component,
@@ -13,6 +13,9 @@ import type {
   PropertyWithTranslation,
 } from "./types";
 import { allowedTypes } from "~/use-cases/allowed-component-types";
+
+import { signal } from "@crystallize/app-signal";
+import { useFetcher } from "@remix-run/react";
 
 type UpdateComponent = {
   type: ComponentType;
@@ -33,10 +36,10 @@ type UseTranslationsProps = {
 };
 
 type HandleTranslationProps = {
-  component: Component;
   componentIndex: number;
   preferences: Preferences;
   variantSku?: string;
+  component?: Component;
 };
 
 export const useTranslations = ({
@@ -46,6 +49,7 @@ export const useTranslations = ({
   variantSku,
   properties,
 }: UseTranslationsProps) => {
+  const fetcher = useFetcher();
   const [translateLanguage, setTranslateLanguage] = useState({
     from: language,
     to: "",
@@ -55,7 +59,7 @@ export const useTranslations = ({
   >(new Map());
   const [propertiesWithTranslation, setPropertiesWithTranslation] =
     useState<PropertyWithTranslation[]>(properties);
-  const [ComponentWithTranslation, setComponentWithTranslation] =
+  const [componentWithTranslation, setComponentWithTranslation] =
     useState<ComponentWithTranslation[]>(components);
 
   const currentProcessingTranslationsCount = [
@@ -63,19 +67,32 @@ export const useTranslations = ({
   ].filter(Boolean).length;
   const totalProcessingTranslationsCount = processingTranslations.size;
 
+  useEffect(() => {
+    // This has to run from the client as we post messages between iframe and parent
+    if (fetcher.data) {
+      const { type, itemId, language: itemLanguage } = fetcher.data;
+      signal.send(type, { itemId, itemLanguage });
+    }
+  }, [fetcher.data]);
+
   const onUpdateComponent = useCallback(
     async (component: ComponentWithTranslation) => {
-      await fetch("/api/update/component", {
-        method: "POST",
-        body: JSON.stringify({
+      const formData = new FormData();
+      formData.append(
+        "data",
+        JSON.stringify({
           component,
           itemId,
           variantSku,
           language: translateLanguage.to,
-        }),
-      });
+        })
+      );
+
+      fetcher.submit(formData, { method: "POST" });
+
+      // refetchItemComponents();
     },
-    [itemId, translateLanguage.to, variantSku]
+    [itemId, translateLanguage.to, variantSku, fetcher]
   );
 
   const updateComponent = useCallback(
@@ -96,7 +113,7 @@ export const useTranslations = ({
 
         if (isChoice) {
           component = (copy[componentIndex].content as ComponentChoiceContent)
-            .selectedComponent;
+            ?.selectedComponent;
         } else if (
           typeof chunkIndex === "number" &&
           typeof chunkComponentIndex === "number"
@@ -139,7 +156,7 @@ export const useTranslations = ({
                 return;
               }
 
-              const id = `${component.componentId}-${chunkComponentIndex}-${chunkComponent.componentId}`;
+              const id = `${component?.componentId}-${chunkComponentIndex}-${chunkComponent.componentId}`;
               const base = {
                 type: chunkComponent.type,
                 componentIndex,
@@ -186,6 +203,10 @@ export const useTranslations = ({
       componentIndex,
       preferences,
     }: HandleTranslationProps) => {
+      if (!component) {
+        return;
+      }
+
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.componentId, true))
       );
@@ -233,6 +254,10 @@ export const useTranslations = ({
       componentIndex,
       preferences,
     }: HandleTranslationProps) => {
+      if (!component) {
+        return;
+      }
+
       setProcessingTranslations(
         (prev) => new Map(prev.set(component.componentId, true))
       );
@@ -288,11 +313,12 @@ export const useTranslations = ({
           return handleChoiceTranslation({
             ...props,
             component: (component.content as ComponentChoiceContent)
-              .selectedComponent,
+              ?.selectedComponent,
           });
         }
 
-        return handleBaseComponentTranslation(props);
+        allowedTypes.includes(component.type) &&
+          handleBaseComponentTranslation(props);
       });
     },
     [
@@ -309,7 +335,7 @@ export const useTranslations = ({
   );
 
   return {
-    ComponentWithTranslation,
+    componentWithTranslation,
     propertiesWithTranslation,
     onTranslate,
     translateLanguage,

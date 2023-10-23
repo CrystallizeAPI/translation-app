@@ -1,7 +1,7 @@
 import type { ClientInterface } from "@crystallize/js-api-client";
 
 export const getAvailableLanguages =
-  (apiClient: ClientInterface) => async () => {
+  (apiClient: ClientInterface) => async (identifier: string) => {
     const data = await apiClient.pimApi(
       `#graphql
             query ($identifier: String!) {
@@ -16,7 +16,7 @@ export const getAvailableLanguages =
             }
         `,
       {
-        identifier: process.env.CRYSTALLIZE_TENANT_IDENTIFIER,
+        identifier,
       }
     );
 

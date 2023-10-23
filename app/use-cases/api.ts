@@ -1,32 +1,37 @@
 import { createClient } from "@crystallize/js-api-client";
 import { requireValidSession } from "~/server/session";
-import { getAvailableLanguages, getItemComponents } from "./read/";
+import {
+  getAvailableLanguages,
+  getItemComponents,
+  getVariantComponents,
+} from "./read";
+import { updateItemComponent, updateVariantComponent } from "./write";
 
 export const getApi = async (request: Request) => {
   const signatureChecked = await requireValidSession(request);
-  const cookie = request.headers.get("Cookie") || "";
-  const cookiePayload = cookie
-    .split(";")
-    .map(
-      (value: string): [string, string] => value.split("=") as [string, string]
-    )
-    .reduce((memo: Record<string, any>, value: [string, string]) => {
-      memo[decodeURIComponent(value[0]?.trim())] = decodeURIComponent(
-        value[1]?.trim()
-      );
-      return memo;
-    }, {});
 
   const apiClient = createClient({
     tenantId: signatureChecked.tenantId,
     tenantIdentifier: signatureChecked.tenantIdentifier,
-    sessionId: cookiePayload["connect.sid"],
+    accessTokenId: process.env.CRYSTALLIZE_ACCESS_TOKEN_ID,
+    accessTokenSecret: process.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET,
+    origin: "-dev.crystallize.digital",
   });
 
   return {
-    getAvailableLanguages: async () => getAvailableLanguages(apiClient)(),
+    getAvailableLanguages: async () =>
+      getAvailableLanguages(apiClient)(signatureChecked.tenantIdentifier),
     getItemComponents: async (
       ...params: Parameters<ReturnType<typeof getItemComponents>>
     ) => getItemComponents(apiClient)(...params),
+    getVariantComponents: async (
+      ...params: Parameters<ReturnType<typeof getVariantComponents>>
+    ) => getVariantComponents(apiClient)(...params),
+    updateItemComponent: async (
+      ...params: Parameters<ReturnType<typeof updateItemComponent>>
+    ) => updateItemComponent(apiClient)(...params),
+    updateVariantComponent: async (
+      ...params: Parameters<ReturnType<typeof updateVariantComponent>>
+    ) => updateVariantComponent(apiClient)(...params),
   };
 };
