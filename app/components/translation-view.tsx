@@ -1,4 +1,4 @@
-import type { Component } from "~/__generated__/types";
+import type { Component, ItemType } from "~/__generated__/types";
 
 import { TranslationForm } from "~/components/translation-form";
 import { TranslationToolbar } from "~/components/translation-toolbar";
@@ -9,15 +9,17 @@ import type { Property } from "~/use-cases/types";
 
 type TranslationViewProps = {
   itemId: string;
+  itemType: ItemType;
   language: string;
-  components: Component[];
   availableLanguages: { code: string; name: string }[];
   variantSku?: string;
   properties: Property[];
+  components?: Component[];
 };
 
 export function TranslationView({
   itemId,
+  itemType,
   language,
   components,
   properties,
@@ -32,7 +34,14 @@ export function TranslationView({
     onChangeLanguage,
     currentProcessingTranslationsCount,
     totalProcessingTranslationsCount,
-  } = useTranslations({ itemId, language, components, variantSku, properties });
+  } = useTranslations({
+    itemId,
+    itemType,
+    language,
+    components,
+    variantSku,
+    properties,
+  });
 
   return (
     <div className="pt-4 bg-gray-50">
@@ -46,10 +55,7 @@ export function TranslationView({
         currentProcessingTranslationsCount={currentProcessingTranslationsCount}
         totalProcessingTranslationsCount={totalProcessingTranslationsCount}
       />
-      <TranslationProperties
-        properties={propertiesWithTranslation}
-        onPropertiesChange={() => {}}
-      />
+      <TranslationProperties properties={propertiesWithTranslation} />
       <TranslationForm components={componentWithTranslation} />
     </div>
   );
