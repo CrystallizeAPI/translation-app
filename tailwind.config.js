@@ -1,12 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./app/**/*.{js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
-    extend: {
-      animation: {
-        "spin-slow": "spin 3s linear infinite",
-      },
-    },
     colors: {
       cyan: {
         50: "#eefdfc",
