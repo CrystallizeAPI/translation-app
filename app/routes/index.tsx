@@ -1,33 +1,39 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { TranslationView } from "~/components/translation-view";
-import { apiClient } from "~/use-cases/shared";
 import {
-  getItemComponents,
-  getAvailableLanguages,
-  getVariantComponents,
-} from "~/use-cases/read";
+  json,
+  redirect,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs,
+} from "@remix-run/node";
+import type { Component } from "~/__generated__/types";
+import { useLoaderData } from "@remix-run/react";
+import { toComponentInput } from "~/use-cases/to-component-input";
+import { TranslationView } from "~/components/translation-view";
+import { getApi } from "~/use-cases/api";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const api = await getApi(request);
   const url = new URL(request.url);
-  const itemId = url.searchParams.get("itemId") ?? "651fb51410fc8c0b9516655a";
+  const itemId = url.searchParams.get("itemId");
+  const language = url.searchParams.get("language");
   const variantSku = url.searchParams.get("variantSku") ?? undefined;
-  const itemLanguageCode = url.searchParams.get("language") ?? "en";
 
-  const availableLanguages = await getAvailableLanguages(apiClient)();
+  if (!itemId || !language) {
+    // TODO: Redirect to a new page where the user can insert the ID manually
+    throw redirect("/invalid");
+  }
+
+  // TODO: make this part of the request to get components or use Promise.all
+  const availableLanguages = await api.getAvailableLanguages();
 
   let components;
   let properties;
+
   if (variantSku) {
-    const data = await getVariantComponents(apiClient)(
-      itemId,
-      itemLanguageCode,
-      variantSku
-    );
+    const data = await api.getVariantComponents(itemId, language, variantSku);
     components = data?.variant?.components;
     properties = { name: data?.variant?.name ?? "" };
   } else {
-    const item = await getItemComponents(apiClient)(itemId, itemLanguageCode);
+    const item = await api.getItemComponents(itemId, language);
     components = item?.components;
     properties = { name: item?.name ?? "" };
   }
@@ -37,9 +43,36 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     properties,
     variantSku,
     components,
-    language: itemLanguageCode,
+    language,
     availableLanguages,
   });
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const api = await getApi(request);
+
+  try {
+    const body = await request.formData();
+    const { itemId, language, component, variantSku } = JSON.parse(
+      (body.get("data") ?? "") as string
+    );
+    const input = toComponentInput(component as Component);
+
+    if (variantSku) {
+      await api.updateVariantComponent({
+        input,
+        language,
+        sku: variantSku,
+        productId: itemId,
+      });
+      return json({ itemId, language, type: "refetchItemVarianComponents" });
+    } else {
+      await api.updateItemComponent({ itemId, language, input });
+      return json({ itemId, language, type: "refetchItemComponents" });
+    }
+  } catch {}
+
+  return null;
 };
 
 export default function Index() {

@@ -22,9 +22,9 @@ export const getItemComponents =
   ${Component}
     `,
       {
-        id: id ?? "651fb51410fc8c0b9516655a",
+        id,
+        language,
         version: "draft",
-        language: language || "en",
       }
     );
 
