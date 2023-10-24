@@ -22,10 +22,11 @@ export const ParagraphCollection = ({
                                 value={el?.title?.text}
                                 placeholder="Paragraph Collection title"
                                 className={`!bg-[#fff] w-full pt-3  text-lg font-medium px-6  placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-none
-                ${!hasTranslation
-                                        ? "text-base font-normal text-gray-400 italic"
-                                        : "text-base font-medium"
-                                    }`}
+                ${
+                    !hasTranslation
+                        ? "text-base font-normal text-gray-400 italic"
+                        : "text-base font-medium"
+                }`}
                                 readOnly
                             />
                         </div>
@@ -33,23 +34,30 @@ export const ParagraphCollection = ({
                             <TextareaAutosize
                                 value={el.body?.plainText?.toString()}
                                 placeholder="Paragraph collection body"
-                                className={`!bg-[#fff] px-6 py-4 min-h-[140px]  w-full focus:outline-none ${!hasTranslation
-                                    ? "text-base font-normal text-gray-400 italic "
-                                    : "text-base font-normal  "
-                                    }`}
+                                className={`!bg-[#fff] px-6 py-4 min-h-[140px]  w-full focus:outline-none ${
+                                    !hasTranslation
+                                        ? "text-base font-normal text-gray-400 italic "
+                                        : "text-base font-normal"
+                                }`}
                                 readOnly
                             />
                         </div>
                         {el?.images && (
                             <div className="px-6 py-6 flex gap-2">
-                                {el?.images?.map((image: any, index: number) => (
-                                    <div
-                                        className="w-32 rounded overflow-hidden p-2 bg-[#fff] shadow"
-                                        key={index}
-                                    >
-                                        <img src={image?.url} className="w-full" alt="Item" />
-                                    </div>
-                                ))}
+                                {el?.images?.map(
+                                    (image: any, index: number) => (
+                                        <div
+                                            className="w-32 rounded overflow-hidden p-2 bg-[#fff] shadow"
+                                            key={index}
+                                        >
+                                            <img
+                                                src={image?.url}
+                                                className="w-full"
+                                                alt="Item"
+                                            />
+                                        </div>
+                                    )
+                                )}
                             </div>
                         )}
                     </div>

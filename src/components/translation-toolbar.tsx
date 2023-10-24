@@ -25,6 +25,9 @@ export function TranslationToolbar({
     onChangeLanguage,
     onTranslate,
 }: TranslationToolbarProps) {
+    const selected = availableLanguages.find(
+        (lang) => lang.code === translateLanguage.to
+    );
     const [preferences, setPreferences] = useState({
         shouldPushTranslationToDraft: false,
         shouldIncludeAllVariants: false,
@@ -61,11 +64,14 @@ export function TranslationToolbar({
                     <div>
                         <Dropdown
                             options={availableLanguages}
+                            buttonText="Select language"
                             selectedOption={translateLanguage.from}
                             onSelectOption={(code) =>
-                                onChangeLanguage({ ...translateLanguage, from: code })
+                                onChangeLanguage({
+                                    ...translateLanguage,
+                                    from: code,
+                                })
                             }
-                            buttonText="Select language"
                         />
                     </div>
                     <span>to </span>
@@ -75,7 +81,10 @@ export function TranslationToolbar({
                             selectedOption={translateLanguage.to}
                             buttonText="Select language"
                             onSelectOption={(code) =>
-                                onChangeLanguage({ ...translateLanguage, to: code })
+                                onChangeLanguage({
+                                    ...translateLanguage,
+                                    to: code,
+                                })
                             }
                         />
                     </div>
@@ -91,7 +100,9 @@ export function TranslationToolbar({
                                 }))
                             }
                         />
-                        Add all translations to {translateLanguage.to} draft
+                        Add all translations to{" "}
+                        {selected ? `${selected.name} (${selected.code})` : ""}{" "}
+                        draft
                     </Label>
                     <Label className="text-xs  whitespace-nowrap  flex items-center gap-2 cursor-pointer">
                         <Checkbox

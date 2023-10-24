@@ -13,13 +13,12 @@ import type {
     PropertyWithTranslation,
 } from "../use-cases/contracts/types";
 
-
 import { signal } from "@crystallize/app-signal";
 import { useFetcher } from "@remix-run/react";
 import { allowedTypes } from "../use-cases/contracts/allowed-components";
 import { translateComponentType } from "~/use-cases/translations/translate-component-type";
-import { Translator, TranslatorArgs } from "./translator.server";
-import { SerializeFrom } from "@remix-run/node";
+import type { Translator, TranslatorArgs } from "./translator.server";
+import type { SerializeFrom } from "@remix-run/node";
 
 type UpdateComponent = {
     type: ComponentType;
@@ -43,13 +42,13 @@ type UseTranslationsProps = {
     language: string;
     properties: SerializeFrom<PropertyWithTranslation[] | null>;
     components?: SerializeFrom<Component[] | null>;
-    variantSku?: string;
+    variantSku?: string | null;
 };
 
 type HandleTranslationProps = {
     componentIndex: number;
     preferences: Preferences;
-    variantSku?: string;
+    variantSku?: string | null;
     component?: Component;
 };
 
@@ -67,8 +66,8 @@ const translator: Translator = {
         });
         const json = await results.json();
         return json.translation;
-    }
-}
+    },
+};
 
 export const useTranslations = ({
     itemId,
@@ -100,7 +99,11 @@ export const useTranslations = ({
     useEffect(() => {
         // This has to run from the client as we post messages between iframe and parent
         if (fetcher.data) {
-            const { type, itemId, language: itemLanguage } = fetcher.data as any;
+            const {
+                type,
+                itemId,
+                language: itemLanguage,
+            } = fetcher.data as any;
             signal.send(type, { itemId, itemLanguage });
         }
     }, [fetcher.data]);
@@ -143,14 +146,16 @@ export const useTranslations = ({
                 let component = copy[componentIndex];
 
                 if (isChoice) {
-                    component = (copy[componentIndex].content as ComponentChoiceContent)
-                        ?.selectedComponent;
+                    component = (
+                        copy[componentIndex].content as ComponentChoiceContent
+                    )?.selectedComponent;
                 } else if (
                     typeof chunkIndex === "number" &&
                     typeof chunkComponentIndex === "number"
                 ) {
-                    component = (copy[componentIndex].content as ContentChunkContent)
-                        .chunks[chunkIndex][
+                    component = (
+                        copy[componentIndex].content as ContentChunkContent
+                    ).chunks[chunkIndex][
                         chunkComponentIndex
                     ] as ComponentWithTranslation;
                 }
@@ -179,7 +184,8 @@ export const useTranslations = ({
 
     const updateProperty = useCallback(
         ({ propertyIndex, translation, translationState }: UpdateProperty) => {
-            let updatedProperty: PropertyWithTranslation | undefined = undefined;
+            let updatedProperty: PropertyWithTranslation | undefined =
+                undefined;
 
             setPropertiesWithTranslation((prev) => {
                 const copy = [...prev];
@@ -201,51 +207,67 @@ export const useTranslations = ({
     );
 
     const handleChunkTranslation = useCallback(
-        ({ component, componentIndex, preferences }: HandleTranslationProps) => {
+        ({
+            component,
+            componentIndex,
+            preferences,
+        }: HandleTranslationProps) => {
             (component?.content as ContentChunkContent)?.chunks.forEach(
                 (chunkComponents, chunkIndex) => {
-                    chunkComponents.forEach((chunkComponent, chunkComponentIndex) => {
-                        (async () => {
-                            if (!allowedTypes.includes(chunkComponent.type)) {
-                                return;
-                            }
+                    chunkComponents.forEach(
+                        (chunkComponent, chunkComponentIndex) => {
+                            (async () => {
+                                if (
+                                    !allowedTypes.includes(chunkComponent.type)
+                                ) {
+                                    return;
+                                }
 
-                            const id = `${component?.componentId}-${chunkComponentIndex}-${chunkComponent.componentId}`;
-                            const base = {
-                                type: chunkComponent.type,
-                                componentIndex,
-                                chunkIndex,
-                                chunkComponentIndex,
-                            };
+                                const id = `${component?.componentId}-${chunkComponentIndex}-${chunkComponent.componentId}`;
+                                const base = {
+                                    type: chunkComponent.type,
+                                    componentIndex,
+                                    chunkIndex,
+                                    chunkComponentIndex,
+                                };
 
-                            setProcessingTranslations((prev) => new Map(prev.set(id, true)));
-
-                            try {
-                                updateComponent({ ...base, translationState: "translating" });
-                                const data = await translateComponentType(
-                                    translateLanguage,
-                                    chunkComponent,
-                                    preferences,
-                                    { translator }
-                                );
-                                const component = updateComponent({
-                                    ...base,
-                                    translationState: "translated",
-                                    translation: data?.translation,
-                                });
-                                preferences.shouldPushTranslationToDraft &&
-                                    !!component &&
-                                    onUpdateComponent(component);
-                            } catch {
-                                updateComponent({ ...base, translationState: "error" });
-                                // TODO: show error message
-                            } finally {
                                 setProcessingTranslations(
-                                    (prev) => new Map(prev.set(id, false))
+                                    (prev) => new Map(prev.set(id, true))
                                 );
-                            }
-                        })();
-                    });
+
+                                try {
+                                    updateComponent({
+                                        ...base,
+                                        translationState: "translating",
+                                    });
+                                    const data = await translateComponentType(
+                                        translateLanguage,
+                                        chunkComponent,
+                                        preferences,
+                                        { translator }
+                                    );
+                                    const component = updateComponent({
+                                        ...base,
+                                        translationState: "translated",
+                                        translation: data?.translation,
+                                    });
+                                    preferences.shouldPushTranslationToDraft &&
+                                        !!component &&
+                                        onUpdateComponent(component);
+                                } catch {
+                                    updateComponent({
+                                        ...base,
+                                        translationState: "error",
+                                    });
+                                    // TODO: show error message
+                                } finally {
+                                    setProcessingTranslations(
+                                        (prev) => new Map(prev.set(id, false))
+                                    );
+                                }
+                            })();
+                        }
+                    );
                 }
             );
         },
@@ -356,20 +378,25 @@ export const useTranslations = ({
     );
 
     const handleNameTranslation = useCallback(
-        async ({ property, propertyIndex, preferences }: HandlePropertyProps) => {
+        async ({
+            property,
+            propertyIndex,
+            preferences,
+        }: HandlePropertyProps) => {
             setProcessingTranslations(
                 (prev) => new Map(prev.set(property.type, true))
             );
 
             try {
-                updateProperty({ propertyIndex, translationState: "translating" });
-                const translation = await translator.translate(
-                    {
-                        text: property.content,
-                        language: translateLanguage,
-                        preferences,
-                    }
-                );
+                updateProperty({
+                    propertyIndex,
+                    translationState: "translating",
+                });
+                const translation = await translator.translate({
+                    text: property.content,
+                    language: translateLanguage,
+                    preferences,
+                });
                 const updatedProperty = updateProperty({
                     propertyIndex,
                     translation,

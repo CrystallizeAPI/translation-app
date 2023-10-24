@@ -1,5 +1,5 @@
 import { createClient } from '@crystallize/js-api-client';
-import { Translator, TranslatorArgs, createTranslator } from './translator.server';
+import { createTranslator } from './translator.server';
 import { createAuthGuard } from './authentication.server';
 
 import { createCookieSessionStorage, redirect } from '@remix-run/node';
@@ -72,7 +72,6 @@ export const buildServices = async (request: Request) => {
             tenantIdentifier: auth.tenantIdentifier,
             accessTokenId: `${process.env.CRYSTALLIZE_ACCESS_TOKEN_ID}`,
             accessTokenSecret: `${process.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET}`,
-            // origin: "-dev.crystallize.digital", // @todo: change that
         },
         profilingOptions,
     );

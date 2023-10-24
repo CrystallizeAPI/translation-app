@@ -4,17 +4,14 @@ import type { ClientInterface } from "@crystallize/js-api-client";
 
 export const getVariantComponents =
     (apiClient: ClientInterface) =>
-        async (id: string, language: string, sku: string) => {
-            const data = await apiClient.pimApi(
-                `#graphql
+    async (id: string, language: string, sku: string) => {
+        const data = await apiClient.pimApi(
+            `#graphql
      query GET_VARIANT_COMPONENTS($id: ID!, $language: String!, $sku: String!, $versionLabel: VersionLabel) {
       product{
        get(id: $id, language: $language, versionLabel: $versionLabel) {
-        id
-        language
-        name
         variant(sku: $sku) {
-          id
+          name
           components {
             ...Component
           }
@@ -24,13 +21,13 @@ export const getVariantComponents =
   }
   ${Component}
     `,
-                {
-                    id,
-                    sku,
-                    language,
-                    version: "draft",
-                }
-            );
+            {
+                id,
+                sku,
+                language,
+                version: "draft",
+            }
+        );
 
-            return data?.product?.get as Maybe<Product>;
-        };
+        return data?.product?.get as Maybe<Product>;
+    };

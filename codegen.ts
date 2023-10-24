@@ -2,9 +2,8 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const tokenId = process.env.CRYSTALLIZE_ACCESS_TOKEN_ID;
 const tokenSecret = process.env.CRYSTALLIZE_ACCESS_TOKEN_SECRET;
-const tenantIdentifier = process.env.CRYSTALLIZE_TENANT_IDENTIFIER;
 
-if (!tokenId || !tokenSecret || !tenantIdentifier) {
+if (!tokenId || !tokenSecret) {
     throw new Error("Missing env variable(s) when generating api legacy schemas");
 }
 

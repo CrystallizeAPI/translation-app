@@ -1,5 +1,5 @@
-import { CrystallizeSignature } from "@crystallize/js-api-client";
-import { JWTPayload, SignJWT, jwtVerify } from "jose";
+import type { CrystallizeSignature } from "@crystallize/js-api-client";
+import { type JWTPayload, SignJWT, jwtVerify } from "jose";
 
 interface JWTOptions {
     expiresIn: string;

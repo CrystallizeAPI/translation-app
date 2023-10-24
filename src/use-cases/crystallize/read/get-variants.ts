@@ -1,23 +1,20 @@
-import type { Item, Maybe } from "~/__generated__/types";
-import { Component } from "./fragments";
+import type { Maybe, Product } from "~/__generated__/types";
 import type { ClientInterface } from "@crystallize/js-api-client";
 
-export const getItemComponents =
+export const getVariants =
     (apiClient: ClientInterface) => async (id: string, language: string) => {
         const data = await apiClient.pimApi(
             `#graphql
      query GET_PRODUCT_COMPONENTS($id: ID!, $language: String!, $versionLabel: VersionLabel) {
-      item {
+      product {
        get(id: $id, language: $language, versionLabel: $versionLabel) {
-        name
-        type
-        components {
-          ...Component
+        variants {
+          id
+          sku
         }
       }
     }
   }
-  ${Component}
     `,
             {
                 id,
@@ -26,5 +23,5 @@ export const getItemComponents =
             }
         );
 
-        return data?.item?.get as Maybe<Item>;
+        return data?.product?.get as Maybe<Product>;
     };

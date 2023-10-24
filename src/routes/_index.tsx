@@ -4,7 +4,8 @@ import {
     type LoaderFunctionArgs,
     type ActionFunctionArgs,
 } from "@remix-run/node";
-import { type Component, ItemType } from "~/__generated__/types";
+import type { Component, Maybe, Item } from "~/__generated__/types";
+import { ItemType } from "~/__generated__/types";
 import { useLoaderData } from "@remix-run/react";
 import { toComponentInput } from "~/core/to-component-input";
 import { TranslationView } from "~/components/translation-view";
@@ -12,44 +13,58 @@ import { buildServices } from "~/core/services.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     const { api } = await buildServices(request);
-
-    console.log({ api })
     const url = new URL(request.url);
     const itemId = url.searchParams.get("itemId");
     const language = url.searchParams.get("language");
-    const variantSku = url.searchParams.get("variantSku") ?? undefined;
+    const variantId = url.searchParams.get("variantId");
 
     if (!itemId || !language) {
         // TODO: Redirect to a new page where the user can insert the ID manually
         throw redirect("/invalid");
     }
 
-    // TODO: make this part of the request to get components or use Promise.all
-    const availableLanguages = await api.getAvailableLanguages();
+    const isVariant = !!variantId;
+    const promises = [api.getAvailableLanguages()];
 
-    let components;
-    let properties;
-    let itemType = ItemType.Product;
+    if (!isVariant) {
+        promises.push(api.getItemComponents(itemId, language));
 
-    if (variantSku) {
-        const data = await api.getVariantComponents(itemId, language, variantSku);
-        components = data?.variant?.components;
-        properties = [{ type: "name", content: data?.variant?.name ?? "" }];
-    } else {
-        const item = await api.getItemComponents(itemId, language);
-        components = item?.components;
-        properties = [{ type: "name", content: item?.name ?? "" }];
-        itemType = item?.type as ItemType;
+        const [availableLanguages, item] = await Promise.all(promises);
+        const { type, name, components } = (item as Maybe<Item>) ?? {};
+
+        return json({
+            itemId,
+            language,
+            availableLanguages,
+            variantSku: null,
+            itemType: type as ItemType,
+            properties: [{ type: "name", content: name ?? "" }],
+            components,
+        });
     }
+
+    // we need the SKU first
+    promises.push(api.getVariants(itemId, language));
+
+    const [availableLanguages, item] = await Promise.all(promises);
+    const variantSku = (
+        item as Awaited<ReturnType<typeof api.getVariants>>
+    )?.variants.find((variant) => variant.id === variantId)?.sku;
+
+    if (!variantSku) {
+        throw redirect("/invalid");
+    }
+
+    const data = await api.getVariantComponents(itemId, language, variantSku);
 
     return json({
         itemId,
-        itemType,
-        properties,
         variantSku,
-        components,
         language,
         availableLanguages,
+        itemType: ItemType.Product,
+        components: data?.variant?.components,
+        properties: [{ type: "name", content: data?.variant?.name ?? "" }],
     });
 };
 
@@ -62,12 +77,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             JSON.parse((body.get("data") ?? "") as string);
 
         if (type === "property") {
-            await api.updateItemName({
-                id: itemId,
-                itemType,
-                language,
-                input: { name: translation.content },
-            });
+            variantSku
+                ? await api.updateVariantName({
+                      id: itemId,
+                      sku: variantSku,
+                      language,
+                      input: { name: translation.content },
+                  })
+                : await api.updateItemName({
+                      id: itemId,
+                      itemType,
+                      language,
+                      input: { name: translation.content },
+                  });
 
             return json({ itemId, language, type: "refetchItem" });
         }
@@ -81,7 +103,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                 sku: variantSku,
                 productId: itemId,
             });
-            return json({ itemId, language, type: "refetchItemVarianComponents" });
+            return json({
+                itemId,
+                language,
+                type: "refetchItemVariantComponents",
+            });
         } else {
             await api.updateItemComponent({ itemId, language, input });
             return json({ itemId, language, type: "refetchItemComponents" });

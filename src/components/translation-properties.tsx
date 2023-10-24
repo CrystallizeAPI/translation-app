@@ -12,8 +12,10 @@ export function TranslationProperties({
     return (
         <div className="my-4">
             {properties.map((property) => {
-                const hasTranslation = property.translationState === "translated";
-                const isTranslating = property.translationState === "translating";
+                const hasTranslation =
+                    property.translationState === "translated";
+                const isTranslating =
+                    property.translationState === "translating";
 
                 return (
                     <div key={property.type} className="group">
@@ -24,7 +26,9 @@ export function TranslationProperties({
                                         ✓
                                     </div>
                                 )}
-                                <span className="font-medium text-xs">{property.type}</span>
+                                <span className="font-medium text-xs">
+                                    {property.type}
+                                </span>
                                 {isTranslating && (
                                     <div className="border-gray-200 h-4 w-4 animate-spin-slow rounded-full border-[3px] border-t-s-green-600" />
                                 )}
@@ -34,9 +38,15 @@ export function TranslationProperties({
                         <div className="relative shadow bg-[#fff] overflow-hidden rounded-md ">
                             <input
                                 key={property.type}
-                                className="px-6 py-4 !bg-[#fff] w-full"
+                                className={`${
+                                    !hasTranslation
+                                        ? "text-base font-normal text-gray-400 italic"
+                                        : "text-base font-normal"
+                                } px-6 py-4 !bg-[#fff] w-full`}
                                 value={property.content}
-                                disabled={property.translationState !== "translated"}
+                                disabled={
+                                    property.translationState !== "translated"
+                                }
                             />
                             {hasTranslation && (
                                 <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
@@ -44,7 +54,10 @@ export function TranslationProperties({
                                         <CopyButton text={property.content} />
                                         <Tooltip content="Add this translation to draft">
                                             <IconButton className="!w-7 !h-7">
-                                                <Icon.Rocket width="20" height="20" />
+                                                <Icon.Rocket
+                                                    width="20"
+                                                    height="20"
+                                                />
                                             </IconButton>
                                         </Tooltip>
                                     </div>

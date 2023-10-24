@@ -14,8 +14,8 @@ import crystallizeStyles from "@crystallize/design-system/styles.css";
 
 export const links: LinksFunction = () => [
     ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-    { rel: "stylesheet", href: crystallizeStyles },
     { rel: "stylesheet", href: stylesheet },
+    { rel: "stylesheet", href: crystallizeStyles },
 ];
 
 export default function App() {

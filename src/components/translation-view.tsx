@@ -6,14 +6,14 @@ import { TranslationProgress } from "~/components/translation-progress";
 import { TranslationProperties } from "~/components/translation-properties";
 import { useTranslations } from "~/core/use-translations";
 import type { Property } from "~/use-cases/contracts/types";
-import { SerializeFrom } from "@remix-run/node";
+import type { SerializeFrom } from "@remix-run/node";
 
 type TranslationViewProps = {
     itemId: string;
     itemType: ItemType;
     language: string;
     availableLanguages: { code: string; name: string }[];
-    variantSku?: string;
+    variantSku?: string | null;
     properties: SerializeFrom<Property[] | null>;
     components?: SerializeFrom<Component[] | null>;
 };
@@ -53,8 +53,12 @@ export function TranslationView({
                 onTranslate={onTranslate}
             />
             <TranslationProgress
-                currentProcessingTranslationsCount={currentProcessingTranslationsCount}
-                totalProcessingTranslationsCount={totalProcessingTranslationsCount}
+                currentProcessingTranslationsCount={
+                    currentProcessingTranslationsCount
+                }
+                totalProcessingTranslationsCount={
+                    totalProcessingTranslationsCount
+                }
             />
             <TranslationProperties properties={propertiesWithTranslation} />
             <TranslationForm components={componentWithTranslation} />

@@ -7,11 +7,15 @@ export const RichText = ({ data }: { data: ComponentWithTranslation }) => {
 
     return (
         <TextareaAutosize
-            value={(data?.content as RichTextContent)?.plainText?.map((a) => a) ?? ""}
-            className={`${!hasTranslation
-                ? "text-base font-normal text-gray-400 italic "
-                : "text-base font-normal "
-                } !bg-[#fff] w-full px-6  py-3  min-h-[140px]`}
+            value={
+                (data?.content as RichTextContent)?.plainText?.map((a) => a) ??
+                ""
+            }
+            className={`${
+                !hasTranslation
+                    ? "text-base font-normal text-gray-400 italic"
+                    : "text-base font-normal"
+            } !bg-[#fff] w-full px-6  py-3  min-h-[140px]`}
             disabled={!hasTranslation}
         />
     );

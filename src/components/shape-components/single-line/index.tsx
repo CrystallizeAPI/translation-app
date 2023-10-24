@@ -6,7 +6,11 @@ export const SingleLine = ({ data }: { data: ComponentWithTranslation }) => {
 
     return (
         <input
-            className="px-6 py-4 !bg-[#fff] w-full"
+            className={`${
+                !hasTranslation
+                    ? "text-base font-normal text-gray-400 italic"
+                    : "text-base font-normal"
+            } px-6 py-4 !bg-[#fff] w-full`}
             value={(data?.content as SingleLineContent)?.text ?? ""}
             disabled={!hasTranslation}
         />

@@ -1,40 +1,59 @@
 import { Button, DropdownMenu, Icon } from "@crystallize/design-system";
 
+type DropdownProps = {
+    options: { name: string; code: string }[];
+    selectedOption: string;
+    onSelectOption: (code: string) => void;
+    buttonText: string;
+};
+
+const DropdownContent = ({
+    options,
+    onSelectOption,
+}: Pick<DropdownProps, "options" | "onSelectOption">) => (
+    <div className="shadow bg-[#fff] w-[150px] rounded-md py-1 flex flex-col">
+        {options.map((option) => {
+            return (
+                <DropdownMenu.Item
+                    key={option.code}
+                    onSelect={() => onSelectOption(option.code)}
+                    className="font-medium px-2 py-1 text-sm text-center cursor-pointer"
+                >
+                    {option.name} ({option.code})
+                </DropdownMenu.Item>
+            );
+        })}
+    </div>
+);
+
 function Dropdown({
     options,
     selectedOption,
     onSelectOption,
     buttonText,
-}: {
-    options: any[];
-    selectedOption: string;
-    onSelectOption: (code: string) => void;
-    buttonText: string;
-}) {
+}: DropdownProps) {
+    const selected = options.find((opt) => opt.code === selectedOption);
+
     return (
         <div>
             <DropdownMenu.Root
-                //@ts-ignore
                 content={
-                    <div className="shadow bg-[#fff] w-[150px] rounded-md py-1 flex flex-col">
-                        {options.map((option) => {
-                            return (
-                                <DropdownMenu.Item
-                                    onSelect={() => onSelectOption(option.code)}
-                                    key={option.code}
-                                    className="font-medium px-2 py-1 text-sm text-center cursor-pointer"
-                                >
-                                    {option.name} ({option.code})
-                                </DropdownMenu.Item>
-                            );
-                        })}
-                    </div>
+                    <DropdownContent
+                        options={options}
+                        onSelectOption={onSelectOption}
+                    />
                 }
             >
                 <Button append={<Icon.Arrow />} variant="elevate">
                     <span className="min-w-[100px]">
-                        {selectedOption ?? (
-                            <span className="italic font-normal mx-2">{buttonText}</span>
+                        {selected ? (
+                            <span>
+                                {selected.name} ({selected.code})
+                            </span>
+                        ) : (
+                            <span className="italic font-normal mx-2">
+                                {buttonText}
+                            </span>
                         )}
                     </span>
                 </Button>
