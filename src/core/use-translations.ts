@@ -59,13 +59,18 @@ type HandlePropertyProps = {
     preferences: Preferences;
 };
 
-type DebounceSignal = {
-    event: Parameters<typeof signal.send>[0];
-    payload: RefetchItem;
-};
+const debounceRefetchItem = debounce<RefetchItem>(
+    (payload) => signal.send("refetchItem", payload),
+    600
+);
 
-const debounceSignal = debounce<DebounceSignal>(
-    ({ event, payload }) => signal.send(event, payload),
+const debounceRefetchItemComponents = debounce<RefetchItem>(
+    (payload) => signal.send("refetchItemComponents", payload),
+    600
+);
+
+const debounceRefetchItemVariantComponents = debounce<RefetchItem>(
+    (payload) => signal.send("refetchItemVariantComponents", payload),
     600
 );
 
@@ -137,17 +142,15 @@ export const useTranslations = ({
             formData.append("data", data);
             await fetch("/?index", { method: "POST", body: formData });
 
-            const signalType =
-                type === "property"
-                    ? "refetchItem"
-                    : variantSku
-                    ? "refetchItemVariantComponents"
-                    : "refetchItemComponents";
+            const payload = { itemId, itemLanguage: toLanguage as string };
 
-            debounceSignal({
-                event: signalType,
-                payload: { itemId, itemLanguage: toLanguage as string },
-            });
+            if (type === "property") {
+                return debounceRefetchItem(payload);
+            }
+
+            return variantSku
+                ? debounceRefetchItemVariantComponents(payload)
+                : debounceRefetchItemComponents(payload);
         },
         [itemId, toLanguage, variantSku, itemType]
     );
