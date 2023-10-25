@@ -11,8 +11,9 @@ import type { SerializeFrom } from "@remix-run/node";
 type TranslationViewProps = {
     itemId: string;
     itemType: ItemType;
-    language: string;
     availableLanguages: { code: string; name: string }[];
+    fromLanguage: string;
+    toLanguage: string | null;
     variantSku?: string | null;
     properties: SerializeFrom<Property[] | null>;
     components?: SerializeFrom<Component[] | null>;
@@ -21,7 +22,8 @@ type TranslationViewProps = {
 export function TranslationView({
     itemId,
     itemType,
-    language,
+    fromLanguage,
+    toLanguage,
     components,
     properties,
     availableLanguages,
@@ -31,14 +33,13 @@ export function TranslationView({
         componentWithTranslation,
         propertiesWithTranslation,
         onTranslate,
-        translateLanguage,
-        onChangeLanguage,
         currentProcessingTranslationsCount,
         totalProcessingTranslationsCount,
     } = useTranslations({
         itemId,
         itemType,
-        language,
+        fromLanguage,
+        toLanguage,
         components,
         variantSku,
         properties,
@@ -48,8 +49,8 @@ export function TranslationView({
         <div className="pt-4 bg-gray-50">
             <TranslationToolbar
                 availableLanguages={availableLanguages}
-                translateLanguage={translateLanguage}
-                onChangeLanguage={onChangeLanguage}
+                toLanguage={toLanguage}
+                fromLanguage={fromLanguage}
                 onTranslate={onTranslate}
             />
             <TranslationProgress

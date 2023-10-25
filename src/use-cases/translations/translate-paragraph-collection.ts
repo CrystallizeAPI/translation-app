@@ -1,6 +1,5 @@
-
-import { Translator } from "~/core/translator.server";
-import { Language, Preferences } from "../contracts/types";
+import type { Translator } from "~/core/translator.server";
+import type { Language, Preferences } from "../contracts/types";
 
 type Deps = {
     translator: Translator;
@@ -17,20 +16,23 @@ export const translateParagraphCollection = async (
         type: "paragraphCollection",
         translation: await Promise.all(
             component?.content?.paragraphs.map(async (paragraph: any) => {
+                const titleText = paragraph?.title?.text?.trim();
+                const bodyText = paragraph?.body?.plainText?.toString()?.trim();
+
                 const [title, body] = await Promise.all([
-                    paragraph?.title
+                    titleText
                         ? translator.translate({
-                            text: paragraph?.title?.text ?? "",
-                            language: translateLanguage,
-                            preferences
-                        })
+                              text: titleText,
+                              language: translateLanguage,
+                              preferences,
+                          })
                         : null,
-                    paragraph?.body
+                    bodyText
                         ? translator.translate({
-                            text: paragraph.body.plainText.toString(),
-                            language: translateLanguage,
-                            preferences
-                        })
+                              text: bodyText,
+                              language: translateLanguage,
+                              preferences,
+                          })
                         : null,
                 ]);
 

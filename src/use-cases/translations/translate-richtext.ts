@@ -1,5 +1,5 @@
-import { Translator } from "~/core/translator.server";
-import { Language, Preferences } from "../contracts/types";
+import type { Translator } from "~/core/translator.server";
+import type { Language, Preferences } from "../contracts/types";
 
 type Deps = {
     translator: Translator;
@@ -11,20 +11,24 @@ export const translateRichText = async (
     preferences: Preferences,
     { translator }: Deps
 ) => {
-    if (!component?.content?.plainText) {
+    const text = component?.content?.plainText?.toString()?.trim();
+
+    if (!text) {
         return {
             id: component.id,
             type: "richText",
             translation: null,
         };
     }
+
     const translation = await translator.translate({
-        text: component?.content?.plainText.toString() ?? "",
+        text,
         language: translateLanguage,
-        preferences
-    })
+        preferences,
+    });
+
     return {
-        id: component.id,
+        id: component.componentId,
         type: "richText",
         translation: [translation],
     };

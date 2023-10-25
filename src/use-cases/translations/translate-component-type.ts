@@ -1,6 +1,5 @@
-
-import { Translator } from "~/core/translator.server";
-import { Language, Preferences } from "../contracts/types";
+import type { Translator } from "~/core/translator.server";
+import type { Language, Preferences } from "../contracts/types";
 import { translateSingleLine } from "./translate-single-line";
 import { translateRichText } from "./translate-richtext";
 import { translateParagraphCollection } from "./translate-paragraph-collection";
@@ -41,6 +40,3 @@ export const translateComponentType = async (
             return null;
     }
 };
-
-
-

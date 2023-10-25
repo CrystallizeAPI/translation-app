@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
     Component,
@@ -14,7 +14,6 @@ import type {
 } from "../use-cases/contracts/types";
 
 import { signal } from "@crystallize/app-signal";
-import { useFetcher } from "@remix-run/react";
 import { allowedTypes } from "../use-cases/contracts/allowed-components";
 import { translateComponentType } from "~/use-cases/translations/translate-component-type";
 import type { Translator, TranslatorArgs } from "./translator.server";
@@ -39,8 +38,9 @@ type UpdateProperty = {
 type UseTranslationsProps = {
     itemId: string;
     itemType: ItemType;
-    language: string;
+    fromLanguage: string;
     properties: SerializeFrom<PropertyWithTranslation[] | null>;
+    toLanguage: string | null;
     components?: SerializeFrom<Component[] | null>;
     variantSku?: string | null;
 };
@@ -49,7 +49,7 @@ type HandleTranslationProps = {
     componentIndex: number;
     preferences: Preferences;
     variantSku?: string | null;
-    component?: Component;
+    component?: SerializeFrom<Component>;
 };
 
 type HandlePropertyProps = {
@@ -72,41 +72,41 @@ const translator: Translator = {
 export const useTranslations = ({
     itemId,
     itemType,
-    language,
+    fromLanguage,
+    toLanguage,
     components,
     variantSku,
     properties,
 }: UseTranslationsProps) => {
-    const fetcher = useFetcher();
-    const [translateLanguage, setTranslateLanguage] = useState({
-        from: language,
-        to: "",
-    });
     const [processingTranslations, setProcessingTranslations] = useState<
         Map<string, boolean>
     >(new Map());
+
     const [propertiesWithTranslation, setPropertiesWithTranslation] =
         useState<SerializeFrom<PropertyWithTranslation[] | null>>(properties);
+
     const [componentWithTranslation, setComponentWithTranslation] = useState<
         SerializeFrom<ComponentWithTranslation[] | null> | undefined
     >(components);
+
+    useEffect(() => {
+        setComponentWithTranslation(components);
+        setPropertiesWithTranslation(properties);
+    }, [components, properties]);
+
+    // use memo since we pass this as dept to useCallback
+    const translateLanguage = useMemo(
+        () => ({
+            from: fromLanguage,
+            to: toLanguage as string,
+        }),
+        [fromLanguage, toLanguage]
+    );
 
     const currentProcessingTranslationsCount = [
         ...processingTranslations.values(),
     ].filter(Boolean).length;
     const totalProcessingTranslationsCount = processingTranslations.size;
-
-    useEffect(() => {
-        // This has to run from the client as we post messages between iframe and parent
-        if (fetcher.data) {
-            const {
-                type,
-                itemId,
-                language: itemLanguage,
-            } = fetcher.data as any;
-            signal.send(type, { itemId, itemLanguage });
-        }
-    }, [fetcher.data]);
 
     const onUpdateComponent = useCallback(
         async (
@@ -120,13 +120,25 @@ export const useTranslations = ({
                 itemType,
                 itemId,
                 variantSku,
-                language: translateLanguage.to,
+                language: toLanguage,
             });
 
             formData.append("data", data);
-            fetcher.submit(formData, { method: "POST" });
+            await fetch("/?index", { method: "POST", body: formData });
+
+            const signalType =
+                type === "property"
+                    ? "refetchItem"
+                    : variantSku
+                    ? "refetchItemVariantComponents"
+                    : "refetchItemComponents";
+
+            signal.send(signalType, {
+                itemId,
+                itemLanguage: toLanguage as string,
+            });
         },
-        [itemId, translateLanguage.to, variantSku, fetcher, itemType]
+        [itemId, toLanguage, variantSku, itemType]
     );
 
     const updateComponent = useCallback(
@@ -139,10 +151,12 @@ export const useTranslations = ({
             isChoice = false,
             translationState,
         }: UpdateComponent) => {
-            let rootComponent: ComponentWithTranslation | undefined = undefined;
+            let rootComponent:
+                | SerializeFrom<ComponentWithTranslation>
+                | undefined = undefined;
 
-            setComponentWithTranslation((prev = []) => {
-                const copy = [...prev];
+            setComponentWithTranslation((prev) => {
+                const copy = [...(prev ?? [])];
                 let component = copy[componentIndex];
 
                 if (isChoice) {
@@ -188,7 +202,7 @@ export const useTranslations = ({
                 undefined;
 
             setPropertiesWithTranslation((prev) => {
-                const copy = [...prev];
+                const copy = [...(prev ?? [])];
                 let property = copy[propertyIndex];
 
                 property.translationState = translationState;
@@ -424,7 +438,7 @@ export const useTranslations = ({
         (preferences: Preferences) => {
             setProcessingTranslations(new Map());
 
-            properties.forEach((property, propertyIndex) => {
+            properties?.forEach((property, propertyIndex) => {
                 if (property.type === "name") {
                     return handleNameTranslation({
                         property,
@@ -463,17 +477,10 @@ export const useTranslations = ({
         ]
     );
 
-    const onChangeLanguage = useCallback(
-        (lang: typeof translateLanguage) => setTranslateLanguage(lang),
-        []
-    );
-
     return {
         componentWithTranslation,
         propertiesWithTranslation,
         onTranslate,
-        translateLanguage,
-        onChangeLanguage,
         currentProcessingTranslationsCount,
         totalProcessingTranslationsCount,
     };

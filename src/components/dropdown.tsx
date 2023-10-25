@@ -2,9 +2,9 @@ import { Button, DropdownMenu, Icon } from "@crystallize/design-system";
 
 type DropdownProps = {
     options: { name: string; code: string }[];
-    selectedOption: string;
     onSelectOption: (code: string) => void;
     buttonText: string;
+    selectedOption?: string;
 };
 
 const DropdownContent = ({

@@ -2,16 +2,12 @@ import { Button, Icon, Label, Checkbox } from "@crystallize/design-system";
 import { useState } from "react";
 import Dropdown from "./dropdown";
 import type { Preferences } from "../use-cases/contracts/types";
-
-type TranslateLanguage = {
-    from: string;
-    to: string;
-};
+import { useLocation, useNavigate } from "@remix-run/react";
 
 type TranslationToolbarProps = {
     availableLanguages: { code: string; name: string }[];
-    translateLanguage: TranslateLanguage;
-    onChangeLanguage: (translationLanguage: TranslateLanguage) => void;
+    fromLanguage: string;
+    toLanguage: string | null;
     onTranslate: ({
         shouldPushTranslationToDraft,
         shouldIncludeAllVariants,
@@ -20,13 +16,16 @@ type TranslationToolbarProps = {
 };
 
 export function TranslationToolbar({
-    translateLanguage,
+    fromLanguage,
+    toLanguage,
     availableLanguages,
-    onChangeLanguage,
     onTranslate,
 }: TranslationToolbarProps) {
+    const navigate = useNavigate();
+    const { pathname, search } = useLocation();
+
     const selected = availableLanguages.find(
-        (lang) => lang.code === translateLanguage.to
+        (lang) => lang.code === toLanguage
     );
     const [preferences, setPreferences] = useState({
         shouldPushTranslationToDraft: false,
@@ -53,7 +52,7 @@ export function TranslationToolbar({
                         intent="action"
                         onClick={() => onTranslate(preferences)}
                         prepend={<Icon.Language width={20} height={20} />}
-                        disabled={translateLanguage.to ? false : true}
+                        disabled={toLanguage ? false : true}
                     >
                         Translate
                     </Button>
@@ -65,27 +64,25 @@ export function TranslationToolbar({
                         <Dropdown
                             options={availableLanguages}
                             buttonText="Select language"
-                            selectedOption={translateLanguage.from}
-                            onSelectOption={(code) =>
-                                onChangeLanguage({
-                                    ...translateLanguage,
-                                    from: code,
-                                })
-                            }
+                            selectedOption={fromLanguage}
+                            onSelectOption={(code) => {
+                                const query = new URLSearchParams(search);
+                                query.set("fromLanguage", code);
+                                navigate(`${pathname}?${query.toString()}`);
+                            }}
                         />
                     </div>
                     <span>to </span>
                     <div className="flex items-center gap-4">
                         <Dropdown
                             options={availableLanguages}
-                            selectedOption={translateLanguage.to}
+                            selectedOption={toLanguage ?? undefined}
                             buttonText="Select language"
-                            onSelectOption={(code) =>
-                                onChangeLanguage({
-                                    ...translateLanguage,
-                                    to: code,
-                                })
-                            }
+                            onSelectOption={(code) => {
+                                const query = new URLSearchParams(search);
+                                query.set("toLanguage", code);
+                                navigate(`${pathname}?${query.toString()}`);
+                            }}
                         />
                     </div>
                 </div>

@@ -15,10 +15,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const { api } = await buildServices(request);
     const url = new URL(request.url);
     const itemId = url.searchParams.get("itemId");
-    const language = url.searchParams.get("language");
+    const fromLanguage = url.searchParams.get("fromLanguage");
+    const toLanguage = url.searchParams.get("toLanguage");
     const variantId = url.searchParams.get("variantId");
 
-    if (!itemId || !language) {
+    if (!itemId || !fromLanguage) {
         // TODO: Redirect to a new page where the user can insert the ID manually
         throw redirect("/invalid");
     }
@@ -27,14 +28,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const promises = [api.getAvailableLanguages()];
 
     if (!isVariant) {
-        promises.push(api.getItemComponents(itemId, language));
+        promises.push(api.getItemComponents(itemId, fromLanguage));
 
         const [availableLanguages, item] = await Promise.all(promises);
         const { type, name, components } = (item as Maybe<Item>) ?? {};
 
         return json({
             itemId,
-            language,
+            fromLanguage,
+            toLanguage,
             availableLanguages,
             variantSku: null,
             itemType: type as ItemType,
@@ -44,7 +46,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
 
     // we need the SKU first
-    promises.push(api.getVariants(itemId, language));
+    promises.push(api.getVariants(itemId, fromLanguage));
 
     const [availableLanguages, item] = await Promise.all(promises);
     const variantSku = (
@@ -55,12 +57,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         throw redirect("/invalid");
     }
 
-    const data = await api.getVariantComponents(itemId, language, variantSku);
+    const data = await api.getVariantComponents(
+        itemId,
+        fromLanguage,
+        variantSku
+    );
 
     return json({
         itemId,
         variantSku,
-        language,
+        fromLanguage,
+        toLanguage,
         availableLanguages,
         itemType: ItemType.Product,
         components: data?.variant?.components,
@@ -124,7 +131,8 @@ export default function Index() {
         itemId,
         itemType,
         components,
-        language,
+        fromLanguage,
+        toLanguage,
         variantSku,
         availableLanguages,
         properties,
@@ -140,7 +148,8 @@ export default function Index() {
                     itemId={itemId}
                     itemType={itemType}
                     variantSku={variantSku}
-                    language={language}
+                    fromLanguage={fromLanguage}
+                    toLanguage={toLanguage}
                     components={components}
                     availableLanguages={availableLanguages}
                     properties={properties}
