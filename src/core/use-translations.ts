@@ -13,11 +13,12 @@ import type {
     PropertyWithTranslation,
 } from "../use-cases/contracts/types";
 
-import { signal } from "@crystallize/app-signal";
+import { signal, type RefetchItem } from "@crystallize/app-signal";
 import { allowedTypes } from "../use-cases/contracts/allowed-components";
 import { translateComponentType } from "~/use-cases/translations/translate-component-type";
 import type { Translator, TranslatorArgs } from "./translator.server";
 import type { SerializeFrom } from "@remix-run/node";
+import { debounce } from "~/use-cases/utils/debounce";
 
 type UpdateComponent = {
     type: ComponentType;
@@ -57,6 +58,16 @@ type HandlePropertyProps = {
     propertyIndex: number;
     preferences: Preferences;
 };
+
+type DebounceSignal = {
+    event: Parameters<typeof signal.send>[0];
+    payload: RefetchItem;
+};
+
+const debounceSignal = debounce<DebounceSignal>(
+    ({ event, payload }) => signal.send(event, payload),
+    600
+);
 
 const translator: Translator = {
     translate: async (args: TranslatorArgs) => {
@@ -133,9 +144,9 @@ export const useTranslations = ({
                     ? "refetchItemVariantComponents"
                     : "refetchItemComponents";
 
-            signal.send(signalType, {
-                itemId,
-                itemLanguage: toLanguage as string,
+            debounceSignal({
+                event: signalType,
+                payload: { itemId, itemLanguage: toLanguage as string },
             });
         },
         [itemId, toLanguage, variantSku, itemType]
