@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     if (!itemId || !fromLanguage) {
         // TODO: Redirect to a new page where the user can insert the ID manually
-        throw redirect("/invalid");
+        throw redirect("/missing-item");
     }
 
     const isVariant = !!variantId;
@@ -54,7 +54,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     )?.variants.find((variant) => variant.id === variantId)?.sku;
 
     if (!variantSku) {
-        throw redirect("/invalid");
+        throw redirect("/missing-item");
     }
 
     const data = await api.getVariantComponents(
