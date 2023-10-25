@@ -7,7 +7,7 @@ const ComponentChoice = ({
   data,
   item,
   setEditedTranslation,
-  isOnVariant
+  isOnVariant,
 }: {
   data: any;
   item: {
@@ -48,7 +48,7 @@ const ComponentChoice = ({
         i.id === data.id ? { ...i, translation: e.target.value } : i
       );
     });
-  }
+  };
 
   const onVariantChange = (e: any) => {
     setEditedTranslation((prev: any) => {
@@ -65,7 +65,7 @@ const ComponentChoice = ({
         return newItem;
       });
     });
-  }
+  };
 
   return (
     <div className=" items-start">
@@ -95,6 +95,7 @@ const ComponentChoice = ({
             <CopyButton text={selectedComponent?.translation} />
           </div>
         </div>
+
         {selectedComponent?.type === "richText" && (
           <div>
             <TextareaAutosize
