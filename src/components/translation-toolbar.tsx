@@ -28,7 +28,7 @@ export function TranslationToolbar({
         (lang) => lang.code === toLanguage
     );
     const [preferences, setPreferences] = useState({
-        shouldPushTranslationToDraft: false,
+        shouldPushTranslationToDraft: true,
         shouldIncludeAllVariants: false,
         customPromptFromUser: "",
     });
@@ -98,8 +98,7 @@ export function TranslationToolbar({
                             }
                         />
                         Add all translations to{" "}
-                        {selected ? `${selected.name} (${selected.code})` : ""}{" "}
-                        draft
+                        {selected ? `${selected.name}` : ""} draft
                     </Label>
                     <Label className="text-xs  whitespace-nowrap  flex items-center gap-2 cursor-pointer">
                         <Checkbox

@@ -1,5 +1,4 @@
 import type { PropertyWithTranslation } from "~/use-cases/contracts/types";
-import { Icon, Tooltip, IconButton } from "@crystallize/design-system";
 import { CopyButton } from "~/components/copy-button";
 
 type TranslationPropertiesProps = {
@@ -52,14 +51,6 @@ export function TranslationProperties({
                                 <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
                                     <div className="flex flex-row gap-2 w-full justify-end">
                                         <CopyButton text={property.content} />
-                                        <Tooltip content="Add this translation to draft">
-                                            <IconButton className="!w-7 !h-7">
-                                                <Icon.Rocket
-                                                    width="20"
-                                                    height="20"
-                                                />
-                                            </IconButton>
-                                        </Tooltip>
                                     </div>
                                 </div>
                             )}

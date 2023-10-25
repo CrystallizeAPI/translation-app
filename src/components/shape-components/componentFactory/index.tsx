@@ -7,7 +7,6 @@ import type {
     RichTextContent,
     SingleLineContent,
 } from "~/__generated__/types";
-import { Icon, Tooltip, IconButton } from "@crystallize/design-system";
 
 type StructuralColor = {
     text: string;
@@ -20,7 +19,9 @@ const getTranslation = (component: ComponentWithTranslation) => {
     }
 
     if (component.type === "richText") {
-        return (component.content as RichTextContent).plainText?.toString() ?? "";
+        return (
+            (component.content as RichTextContent).plainText?.toString() ?? ""
+        );
     }
 
     if (component.type === "paragraphCollection") {
@@ -55,6 +56,14 @@ export default function ComponentFactory({
     const hasTranslation = translationState === "translated";
     const isTranslating = translationState === "translating";
 
+    if (
+        !component.content ||
+        ("paragraphs" in component.content &&
+            !component.content?.paragraphs?.length)
+    ) {
+        return null;
+    }
+
     if (isStructuralComponent) {
         return (
             <div className="group bg-[#fff] border-b border-solid border-purple-100 ">
@@ -82,11 +91,6 @@ export default function ComponentFactory({
                         <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
                             <div className="flex flex-row gap-2 w-full justify-end">
                                 <CopyButton text={getTranslation(component)} />
-                                <Tooltip content="Add this translation to draft">
-                                    <IconButton className="!w-7 !h-7">
-                                        <Icon.Rocket width="20" height="20" />
-                                    </IconButton>
-                                </Tooltip>
                             </div>
                         </div>
                     )}
@@ -106,7 +110,9 @@ export default function ComponentFactory({
                     ) : (
                         <div className="-mr-1">{componentType[type]}</div>
                     )}
-                    <span className="font-medium text-xs">{component?.componentId}</span>
+                    <span className="font-medium text-xs">
+                        {component?.componentId}
+                    </span>
                     {isTranslating && (
                         <div className="border-gray-200 h-4 w-4 animate-spin-slow rounded-full border-[3px] border-t-s-green-600" />
                     )}
@@ -119,11 +125,6 @@ export default function ComponentFactory({
                     <div className="group-hover:block hidden absolute top-2 p-0.5 rounded-md bg-purple-50 right-2">
                         <div className="flex flex-row gap-2 w-full justify-end">
                             <CopyButton text={getTranslation(component)} />
-                            <Tooltip content="Add this translation to draft">
-                                <IconButton className="!w-7 !h-7">
-                                    <Icon.Rocket width="20" height="20" />
-                                </IconButton>
-                            </Tooltip>
                         </div>
                     </div>
                 )}

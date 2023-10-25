@@ -20,8 +20,8 @@ export const ParagraphCollection = ({
                         <div className="relative flex justify-between items-center">
                             <input
                                 value={el?.title?.text}
-                                placeholder="Paragraph Collection title"
-                                className={`!bg-[#fff] w-full pt-3  text-lg font-medium px-6  placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-none
+                                placeholder="Paragraph title"
+                                className={`!bg-[#fff] w-full pt-3 text-lg font-medium px-6  placeholder:font-normal placeholder:text-base placeholder:italic focus:outline-none
                 ${
                     !hasTranslation
                         ? "text-base font-normal text-gray-400 italic"
@@ -32,9 +32,9 @@ export const ParagraphCollection = ({
                         </div>
                         <div className="w-full relative flex">
                             <TextareaAutosize
-                                value={el.body?.plainText?.toString()}
-                                placeholder="Paragraph collection body"
-                                className={`!bg-[#fff] px-6 py-4 min-h-[140px]  w-full focus:outline-none ${
+                                value={el.body?.plainText?.toString() ?? ""}
+                                placeholder="Paragraph body"
+                                className={`!bg-[#fff] px-6 py-4 min-h-[140px] w-full focus:outline-none ${
                                     !hasTranslation
                                         ? "text-base font-normal text-gray-400 italic "
                                         : "text-base font-normal"
