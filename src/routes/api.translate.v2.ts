@@ -1,7 +1,10 @@
 import { type ActionFunction, json } from "@remix-run/node";
 import { buildServices } from "~/core/services.server";
 
-export const maxDuration = 300; // Increase vercel serverless functions timeout
+// Increase vercel serverless functions timeout
+export const config = {
+    maxDuration: 300,
+};
 
 export const action: ActionFunction = async ({ request }) => {
     const body = await request.json();
